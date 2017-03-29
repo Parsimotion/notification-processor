@@ -1,5 +1,5 @@
 _ = require "lodash"
-Processor = require "./processor"
+ProcessorBuilder = require "./processorBuilder"
 should = require "should"
 
 statusAsync = (expectedStatus, done) -> (err) ->
@@ -11,7 +11,9 @@ azureContext = (verifier) ->
   done: verifier
 
 doWith = (verifier, fn) ->
-  new Processor fn
+  ProcessorBuilder.create()
+    .withFunction fn
+    .build()
     .process azureContext(verifier), {}
 
 describe "Promise - Processor", ->
