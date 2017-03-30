@@ -1,5 +1,5 @@
 _ = require "lodash"
-ProcessorBuilder = require "./processorBuilder"
+ProcessorBuilder = require "./processor.builder"
 should = require "should"
 
 statusAsync = (expectedStatus, done) -> (err) ->
