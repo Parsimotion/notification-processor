@@ -1,6 +1,6 @@
 _ = require "lodash"
 Processor = require "./processor"
-logger = require "./logger.subscriber"
+logger = require "./observers/logger.observer"
 
 module.exports =
   class ProcessorBuilder
