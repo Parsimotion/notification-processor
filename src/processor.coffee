@@ -1,19 +1,18 @@
 _ = require "lodash"
-errorToJson = require "error-to-json"
+EventEmitter = require "events"
 Promise = require "bluebird"
 
 module.exports =
-  class Processor
+  class Processor extends EventEmitter
 
     constructor: (@runner) ->
 
-    process: ({ done, log }, message) ->
-      log "An new message has been received", message
-
+    process: (context, message) ->
+      @emit "started", { context, message }
       Promise.method(@runner) message
-      .tap -> log "Process successful"
+      .tap => @emit "successful", { context, message }
       .thenReturn()
-      .tapCatch (err) -> log "Process unsuccessful", errorToJson(err)
-      .asCallback done
+      .tapCatch (err) => @emit "unsuccessful", { context, message, err }
+      .asCallback context.done
 
       return

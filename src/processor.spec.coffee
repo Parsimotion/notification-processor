@@ -7,7 +7,7 @@ statusAsync = (expectedStatus, done) -> (err) ->
   if resolved is expectedStatus then done() else done "Async failed: expected=#{expectedStatus}, resolved=#{resolved}"
 
 azureContext = (verifier) ->
-  log: _.noop
+  log: console.log
   done: verifier
 
 doWith = (verifier, fn) ->
