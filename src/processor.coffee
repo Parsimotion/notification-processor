@@ -5,15 +5,17 @@ Promise = require "bluebird"
 module.exports =
   class Processor extends EventEmitter
 
-    constructor: (@runner) ->
+    constructor: (@adapter, @runner) ->
 
-    process: (context, message) =>
-      @emit "started", { context, message }
-      Promise.method(@runner) message
-      .tap => @emit "successful", { context, message }
+    process: (context, raw) =>
+      { meta, message } = @adapter { context, message: raw }
+
+      @emit "started", { context, message, meta }
+      Promise.method(@runner) { message, meta }
+      .tap => @emit "successful", { context, message, meta }
       .thenReturn()
-      .tapCatch (err) => @emit "unsuccessful", { context, message, err }
-      .finally => @emit "finished", { context, message }
+      .tapCatch (err) => @emit "unsuccessful", { context, message, meta, err }
+      .finally => @emit "finished", { context, message, meta }
       .asCallback context.done
 
       return

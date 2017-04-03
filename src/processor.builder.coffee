@@ -1,14 +1,20 @@
 _ = require "lodash"
 Processor = require "./processor"
 logger = require "./observers/logger.observer"
+ServiceBusAdapter = require "./service.bus.adapter"
 
 module.exports =
   class ProcessorBuilder
 
     constructor: ->
       @listeners = []
+      @adapter = _.identity
 
     @create: -> new @
+
+    fromServiceBus: ->
+      @adapter = ServiceBusAdapter
+      @
 
     withFunction: (@command) -> @
 
@@ -20,7 +26,7 @@ module.exports =
       @
 
     build: ->
-      processor = new Processor @command
+      processor = new Processor @adapter, @command
       _.forEach @listeners, (listener) ->
         listener.listenTo processor
 

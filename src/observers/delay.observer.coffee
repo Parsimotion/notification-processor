@@ -14,18 +14,18 @@ module.exports =
       listenTo: (emitter) ->
         emitter.on "finished", @finish
 
-      finish: ({ message }) =>
-        delay = @_messageDelay message
+      finish: ({ message, meta }) =>
+        delay = @_messageDelay meta
         return Promise.resolve() unless delay? and @_delayChanged delay
 
         @currentDelay = delay
         @publish message, @currentDelay.name
 
-      _messageDelay: (message) =>
-        @_delayByMilliseconds @_millisecondsDelay message, new Date()
+      _messageDelay: (meta) =>
+        @_delayByMilliseconds @_millisecondsDelay meta, new Date()
 
-      _millisecondsDelay: ({ Sent }, now) =>
-        enqueuedTime = moment.utc new Date Sent
+      _millisecondsDelay: ({ insertionTime }, now) =>
+        enqueuedTime = moment.utc new Date insertionTime
         moment.utc(now).diff enqueuedTime
 
       _delayChanged: (newDelay) => !_.isEqual newDelay, @currentDelay

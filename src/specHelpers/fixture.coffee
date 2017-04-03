@@ -9,13 +9,14 @@ redis =
   topic: "un-topic"
   subscription: "una-subscription"
 
-message =
-  un: "json"
-  CompanyId: 123
-  ResourceId: 456
-  Sent: "Sat, 05 Nov 2016 16:44:43 GMT"
+raw =
+  message:
+    CompanyId: 123
+    ResourceId: 456
+  meta:
+    insertionTime: "Sat, 05 Nov 2016 16:44:43 GMT"
 
 module.exports = {
   redis
-  message
+  raw
 }

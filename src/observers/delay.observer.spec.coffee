@@ -2,7 +2,7 @@ require "../specHelpers/redis.observer.mock"
 should = require "should"
 moment = require "moment"
 DelayObserver = require "./delay.observer"
-{ redis, message } = require "../specHelpers/fixture"
+{ redis, raw } = require "../specHelpers/fixture"
 { minimal, mild, moderate, high, huge } = require "./delay.levels"
 { observer } = {}
 
@@ -11,7 +11,7 @@ describe "Delay observer", ->
     observer = new DelayObserver redis
 
   it "should publish if delay changes", ->
-    observer.finish { message }
+    observer.finish raw
     .then =>
       observer
       .redis.spies.publishAsync
@@ -20,16 +20,16 @@ describe "Delay observer", ->
 
   it "should not publish if delay did not change", ->
     observer.currentDelay = huge
-    observer.finish { message }
+    observer.finish raw
     .then =>
       observer
       .redis.spies.publishAsync
       .notCalled.should.be.true()
 
   it "should get delay in milliseconds", ->
-    enqueuedTime = moment new Date message.Sent
+    enqueuedTime = moment new Date raw.meta.insertionTime
     now = enqueuedTime.add 100, 'ms'
-    delay = observer._millisecondsDelay message, now.toDate()
+    delay = observer._millisecondsDelay raw.meta, now.toDate()
     delay.should.eql 100
 
   it "should transform delay in milliseconds to delay object", ->
