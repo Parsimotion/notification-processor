@@ -25,6 +25,9 @@ module.exports =
       @listeners = _.concat @listeners, args
       @
 
+    ignoreUsers(): ->
+      @
+
     build: ->
       processor = new Processor @adapter, @command
       _.forEach @listeners, (listener) ->
