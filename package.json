@@ -12,10 +12,13 @@
     "url": "git+https://github.com/Parsimotion/notification-processor.git"
   },
   "dependencies": {
+    "bluebird": "^3.5.0",
     "convert-units": "^2.1.0",
     "error-to-json": "^1.1.0",
     "moment": "^2.18.1",
     "redis": "^2.7.1",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.0",
     "require-directory": "^2.1.1"
   },
   "devDependencies": {
@@ -28,8 +31,10 @@
     "grunt-mocha-test": "0.13.2",
     "lodash": "4.17.4",
     "mocha": "3.2.0",
+    "nock": "^9.0.11",
     "proxyquire": "^1.7.11",
-    "should": "11.2.1",
+    "should": "^11.2.1",
+    "should-sinon": "0.0.5",
     "sinon": "^2.1.0"
   },
   "author": "Parsimotion",
