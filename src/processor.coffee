@@ -6,7 +6,6 @@ module.exports =
   class Processor extends EventEmitter
 
     constructor: (@runner) ->
-      super()
 
     process: (context, message) =>
       @emit "started", { context, message }
