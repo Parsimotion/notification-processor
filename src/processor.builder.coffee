@@ -13,7 +13,10 @@ module.exports =
     withFunction: (@command) -> @
 
     withLogging: ->
-      @listeners.push logger
+      @withListeners logger
+
+    withListeners: (args...) ->
+      @listeners = _.concat @listeners, args
       @
 
     build: ->
