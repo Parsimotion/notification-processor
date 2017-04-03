@@ -10,3 +10,6 @@ module.exports =
 
     observable.on "unsuccessful", ({ context: { log }, err }) ->
       log "Process unsuccessful", errorToJson(err)
+
+    observable.on "finished", ({ context: { log } }) ->
+      log "Process finished"
