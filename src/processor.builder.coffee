@@ -2,6 +2,7 @@ _ = require "lodash"
 Processor = require "./processor"
 logger = require "./observers/logger.observer"
 ServiceBusAdapter = require "./service.bus.adapter"
+IgnoreUsers = require "./ignore.user.filter"
 
 module.exports =
   class ProcessorBuilder
@@ -9,6 +10,7 @@ module.exports =
     constructor: ->
       @listeners = []
       @adapter = _.identity
+      @filters = []
 
     @create: -> new @
 
@@ -26,10 +28,11 @@ module.exports =
       @
 
     ignoreUsers: () ->
+      @filters = _.concat @filters, IgnoreUsers
       @
 
     build: ->
-      processor = new Processor @adapter, @command
+      processor = new Processor @filters, @adapter, @command
       _.forEach @listeners, (listener) ->
         listener.listenTo processor
 

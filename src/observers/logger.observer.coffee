@@ -13,3 +13,6 @@ module.exports =
 
     observable.on "finished", ({ context: { log } }) ->
       log "Process finished"
+
+    observable.on "ignored", ({ context: { log }, message }) ->
+      log "Message ignored", message
