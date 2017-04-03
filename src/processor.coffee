@@ -6,8 +6,9 @@ module.exports =
   class Processor extends EventEmitter
 
     constructor: (@runner) ->
+      super()
 
-    process: (context, message) ->
+    process: (context, message) =>
       @emit "started", { context, message }
       Promise.method(@runner) message
       .tap => @emit "successful", { context, message }
