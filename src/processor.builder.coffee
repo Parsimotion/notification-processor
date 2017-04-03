@@ -25,7 +25,7 @@ module.exports =
       @listeners = _.concat @listeners, args
       @
 
-    ignoreUsers(): ->
+    ignoreUsers: () ->
       @
 
     build: ->
