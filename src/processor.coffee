@@ -13,6 +13,7 @@ module.exports =
       .tap => @emit "successful", { context, message }
       .thenReturn()
       .tapCatch (err) => @emit "unsuccessful", { context, message, err }
+      .finally => @emit "finished", { context, message }
       .asCallback context.done
 
       return
