@@ -1,2 +1,1 @@
-
-module.exports = require "./notification.processor"
+module.exports = require "./processorBuilder"
