@@ -17,5 +17,3 @@ module.exports =
     _getChannel: (message) =>
         { CompanyId, ResourceId } = message
         "#{@_channelPrefix_()}/#{@app}/#{CompanyId}/#{@topic}/#{@subscription}/#{ResourceId}"
-
-    _channelPrefix_: -> "health-message-sb"
