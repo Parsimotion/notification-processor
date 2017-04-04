@@ -6,4 +6,4 @@ module.exports =
   	LoggerObserver: require "./observers/logger.observer"
   	DelayObserver: require "./observers/delay.observer"
   Processors: 
-  	RequestProcessor: require "./processors/request.processors"
+  	RequestProcessor: require "./processors/request.processor"
