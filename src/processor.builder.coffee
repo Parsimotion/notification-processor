@@ -3,6 +3,7 @@ Processor = require "./processor"
 logger = require "./observers/logger.observer"
 ServiceBusAdapter = require "./service.bus.adapter"
 IgnoreUsers = require "./ignore.user.filter"
+QueueAdapter = require "./queue.adapter"
 
 module.exports =
   class ProcessorBuilder
@@ -16,6 +17,10 @@ module.exports =
 
     fromServiceBus: ->
       @adapter = ServiceBusAdapter
+      @
+
+    fromQueue: ->
+      @adapter = QueueAdapter
       @
 
     withFunction: (@command) -> @
