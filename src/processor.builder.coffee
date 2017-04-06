@@ -1,44 +1,36 @@
 _ = require "lodash"
 Processor = require "./processor"
 logger = require "./observers/logger.observer"
-ServiceBusAdapter = require "./service.bus.adapter"
-IgnoreUsers = require "./ignore.user.filter"
-QueueAdapter = require "./queue.adapter"
+{ UnknownSource, ServiceBusSource, QueueSource } = require "./sources"
 
-module.exports =
-  class ProcessorBuilder
+class ProcessorBuilder
 
-    constructor: ->
-      @listeners = []
-      @adapter = _.identity
-      @filters = []
+  constructor: ->
+    @source = UnknownSource
+    @listeners = []
 
-    @create: -> new @
+  @create: -> new @
 
-    fromServiceBus: ->
-      @adapter = ServiceBusAdapter
-      @
+  withSource: (@source) -> @
 
-    fromQueue: ->
-      @adapter = QueueAdapter
-      @
+  fromServiceBus: -> @withSource ServiceBusSource
 
-    withFunction: (@command) -> @
+  fromQueue: -> @withSource QueueSource
 
-    withLogging: ->
-      @withListeners logger
+  withFunction: (@command) -> @
 
-    withListeners: (args...) ->
-      @listeners = _.concat @listeners, args
-      @
+  withLogging: ->
+    @withListeners logger
 
-    ignoreUsers: () ->
-      @filters = _.concat @filters, IgnoreUsers
-      @
+  withListeners: (args...) ->
+    @listeners = _.concat @listeners, args
+    @
 
-    build: ->
-      processor = new Processor @filters, @adapter, @command
-      _.forEach @listeners, (listener) ->
-        listener.listenTo processor
+  build: ->
+    processor = new Processor { @source, runner: @command }
+    _.forEach @listeners, (listener) ->
+      listener.listenTo processor
 
-      processor
+    processor
+
+module.exports = ProcessorBuilder

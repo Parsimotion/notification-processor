@@ -5,13 +5,13 @@ Promise = require "bluebird"
 module.exports =
   class Processor extends EventEmitter
 
-    constructor: (@filters, @adapter, @runner) ->
+    constructor: ({ @source, @runner }) ->
 
     process: (context, raw) =>
-      { meta, message } = @adapter { context, message: raw }
+      { meta, message } = @source.adapt { context, message: raw }
 
       @emit "started", { context, message, meta }
-      if @shouldBeIgnore { meta, message }
+      if @source.shouldBeIgnore { meta, message }
         @emit "ignored", { context, message, meta }
         context.done()
         return
@@ -24,6 +24,3 @@ module.exports =
       .asCallback context.done
 
       return
-
-    shouldBeIgnore: ({meta, message}) ->
-      _.some @filters, (filter) -> filter { meta, message }
