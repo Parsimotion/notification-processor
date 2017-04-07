@@ -11,4 +11,4 @@ module.exports =
     meta: insertionTime: message.Sent
 
   shouldBeIgnore: ({ message: { CompanyId }}) ->
-    _.includes IgnoredUsers, CompanyId.toString()
+    _.includes IgnoredUsers, CompanyId?.toString()
