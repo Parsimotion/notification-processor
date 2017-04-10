@@ -2,34 +2,33 @@ require "../specHelpers/redis.observer.mock"
 should = require "should"
 moment = require "moment"
 DelayObserver = require "./delay.observer"
-{ redis, raw } = require "../specHelpers/fixture"
+{ redis, notification } = require "../specHelpers/fixture"
 { minimal, mild, moderate, high, huge } = require "./delay.levels"
 { observer } = {}
 
 describe "Delay observer", ->
   beforeEach ->
-    observer = new DelayObserver redis
+    observer = new DelayObserver { redis, app: "una-app", path: "un-topic/una-subscription" }
 
   it "should publish if delay changes", ->
-    observer.finish raw
+    observer.finish notification
     .then =>
-      observer
-      .redis.spies.publishAsync
-      .withArgs "health-delay-sb/una-app/123/un-topic/una-subscription/456", 'Huge'
+      observer.redis.spies.publishAsync
+      .withArgs "health-delay-sb/una-app/un-topic/una-subscription", '"Huge"'
       .calledOnce.should.be.true()
 
   it "should not publish if delay did not change", ->
     observer.currentDelay = huge
-    observer.finish raw
+    observer.finish notification
     .then =>
       observer
       .redis.spies.publishAsync
       .notCalled.should.be.true()
 
   it "should get delay in milliseconds", ->
-    enqueuedTime = moment new Date raw.meta.insertionTime
+    enqueuedTime = moment new Date notification.meta.insertionTime
     now = enqueuedTime.add 100, 'ms'
-    delay = observer._millisecondsDelay raw.meta, now.toDate()
+    delay = observer._millisecondsDelay notification.meta, now.toDate()
     delay.should.eql 100
 
   it "should transform delay in milliseconds to delay object", ->

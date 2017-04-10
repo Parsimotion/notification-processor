@@ -4,23 +4,21 @@ Promise = require "bluebird"
 
 module.exports =
   class RedisObserver
-    constructor: (redisConfig) ->
-      _.defaults redisConfig,
+    constructor: ({ redis = {} }) ->
+      _.defaults redis,
         host: process.env.REDIS_HOST
         port: process.env.REDIS_PORT
         db: process.env.REDIS_DB
         auth: process.env.REDIS_AUTH
 
-      @redis = Redis.createClient redisConfig.port, redisConfig.host, db: redisConfig.db
-      @redis.auth redisConfig.auth if redisConfig.auth
-      { @app, @topic, @subscription } = redisConfig
+      @redis = Redis.createClient redis.port, redis.host, db: redis.db
+      @redis.auth redis.auth if redis.auth
 
-    publish: (message, value) =>
-      @redis.publishAsync @_getChannel(message), @_buildValue_(value)
+    publish: (notification, value) =>
+      @redis.publishAsync @_getChannel(notification), @_buildValue_(value)
 
     _buildValue_: (value) ->
       JSON.stringify value
 
-    _getChannel: (message) =>
-        { CompanyId, ResourceId } = message
-        "#{@_channelPrefix_()}/#{@app}/#{CompanyId}/#{@topic}/#{@subscription}/#{ResourceId}"
+    _getChannel: (notification) =>
+      "health-delay-#{notification.type}/#{@_messagePath_ notification}"

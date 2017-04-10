@@ -7,21 +7,21 @@ RedisObserver = require "./redis.observer"
 module.exports =
     class DelayObserver extends RedisObserver
 
-      constructor: (redis) ->
-        super redis
+      constructor: ({ redis, @app, @path}) ->
+        super { redis }
         @currentDelay = minimal
 
       listenTo: (emitter) ->
         emitter.on "finished", @finish
 
-      finish: ({ message, meta }) =>
-        delay = @_messageDelay meta
+      finish: (notification) =>
+        delay = @_messageDelay notification
         return Promise.resolve() unless delay? and @_delayChanged delay
 
         @currentDelay = delay
-        @publish message, @currentDelay.name
+        @publish notification, @currentDelay.name
 
-      _messageDelay: (meta) =>
+      _messageDelay: ({meta}) =>
         @_delayByMilliseconds @_millisecondsDelay meta, new Date()
 
       _millisecondsDelay: ({ insertionTime }, now) =>
@@ -34,6 +34,4 @@ module.exports =
         delayLevels = [ minimal, mild, moderate, high, huge ]
         _.findLast delayLevels, ({value}) => ms >= value
 
-      _buildValue_ : _.identity
-
-      _channelPrefix_: -> "health-delay-sb"
+      _messagePath_: -> "#{@app}/#{@path}"
