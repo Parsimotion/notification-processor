@@ -9,6 +9,7 @@ module.exports =
   newNotification: ({ message }) ->
     message: _.omit message, "Sent"
     meta: insertionTime: message.Sent
+    type: "sb"
 
   shouldBeIgnore: ({ message: { CompanyId }}) ->
     _.includes IgnoredUsers, CompanyId?.toString()

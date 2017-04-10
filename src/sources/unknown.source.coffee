@@ -1,5 +1,5 @@
 _ = require "lodash"
 
 module.exports =
-  newNotification: _.identity
+  newNotification: ({ message }) -> { message, type: "uk" }
   shouldBeIgnore: -> false

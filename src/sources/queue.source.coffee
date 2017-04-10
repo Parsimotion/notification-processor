@@ -9,6 +9,7 @@ module.exports =
   newNotification: ({ context: { bindingData : { insertionTime } }, message }) ->
     message: message
     meta: { insertionTime }
+    type: "as"
 
   shouldBeIgnore: ({ message: { user_id }}) ->
     _.includes IgnoredUsers, user_id?.toString()
