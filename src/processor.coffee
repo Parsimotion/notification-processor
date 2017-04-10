@@ -8,7 +8,7 @@ module.exports =
     constructor: ({ @source, @runner }) ->
 
     process: (context, raw) =>
-      { meta, message } = @source.adapt { context, message: raw }
+      { meta, message } = @source.newNotification { context, message: raw }
 
       @emit "started", { context, message, meta }
       if @source.shouldBeIgnore { meta, message }

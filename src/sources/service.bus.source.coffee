@@ -6,7 +6,7 @@ MeliUsersThanCanNotRefreshAccessToken = process.env.MeliUsersThanCanNotRefreshAc
 IgnoredUsers = _.concat MeliUsersThanNotBelongsToProducteca, MeliUsersThanCanNotRefreshAccessToken
 
 module.exports =
-  adapt: ({ message }) ->
+  newNotification: ({ message }) ->
     message: _.omit message, "Sent"
     meta: insertionTime: message.Sent
 

@@ -1,5 +1,5 @@
 _ = require "lodash"
 
 module.exports =
-  adapt: _.identity
+  newNotification: _.identity
   shouldBeIgnore: -> false
