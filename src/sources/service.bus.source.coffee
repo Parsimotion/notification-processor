@@ -1,4 +1,5 @@
 _ = require "lodash"
+DelayObserver = require "../observers/delay.observer"
 
 MeliUsersThanNotBelongsToProducteca = process.env.MeliUsersThanNotBelongsToProducteca?.split(",") or []
 MeliUsersThanCanNotRefreshAccessToken = process.env.MeliUsersThanCanNotRefreshAccessToken?.split(",") or []
@@ -13,3 +14,6 @@ module.exports =
 
   shouldBeIgnore: ({ message: { CompanyId }}) ->
     _.includes IgnoredUsers, CompanyId?.toString()
+
+  delayObserver: ({ redis, app, topic, subscription }) ->
+    new DelayObserver { redis, app, path: "#{topic}/#{subscription}" }
