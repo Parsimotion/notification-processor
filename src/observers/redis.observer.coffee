@@ -17,8 +17,5 @@ module.exports =
     publish: (notification, value) =>
       @redis.publishAsync @_getChannel(notification), @_buildValue_(value)
 
-    _buildValue_: (value) ->
-      JSON.stringify value
-
     _getChannel: (notification) =>
       "health-delay-#{notification.type}/#{@_messagePath_ notification}"

@@ -35,3 +35,5 @@ module.exports =
         _.findLast delayLevels, ({value}) => ms >= value
 
       _messagePath_: -> "#{@app}/#{@path}"
+
+      _buildValue_: _.identity
