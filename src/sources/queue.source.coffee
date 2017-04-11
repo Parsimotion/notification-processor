@@ -12,8 +12,8 @@ module.exports =
     meta: { insertionTime }
     type: "as"
 
-  shouldBeIgnore: ({ message: { user_id }}) ->
-    _.includes IgnoredUsers, user_id?.toString()
+  shouldBeIgnore: ({ notification }) ->
+    _.includes IgnoredUsers, notification?.message?.user_id?.toString()
 
   delayObserver: ({ redis, app, queue }) ->
     new DelayObserver { redis, app, path: queue }

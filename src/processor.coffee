@@ -8,19 +8,19 @@ module.exports =
     constructor: ({ @source, @runner }) ->
 
     process: (context, raw) =>
-      { meta, message } = @source.newNotification { context, message: raw }
+      notification = @source.newNotification { context, message: raw }
 
-      @emit "started", { context, message, meta }
-      if @source.shouldBeIgnore { meta, message }
-        @emit "ignored", { context, message, meta }
+      @emit "started", { context, notification }
+      if @source.shouldBeIgnore { notification }
+        @emit "ignored", { context, notification }
         context.done()
         return
 
-      Promise.method(@runner) { message, meta }
-      .tap => @emit "successful", { context, message, meta }
+      Promise.method(@runner) notification
+      .tap => @emit "successful", { context, notification }
       .thenReturn()
-      .tapCatch (err) => @emit "unsuccessful", { context, message, meta, err }
-      .finally => @emit "finished", { context, message, meta }
+      .tapCatch (err) => @emit "unsuccessful", { context, notification, err }
+      .finally => @emit "finished", { context, notification }
       .asCallback context.done
 
       return

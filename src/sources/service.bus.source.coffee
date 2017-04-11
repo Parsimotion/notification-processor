@@ -12,8 +12,8 @@ module.exports =
     meta: insertionTime: message.Sent
     type: "sb"
 
-  shouldBeIgnore: ({ message: { CompanyId }}) ->
-    _.includes IgnoredUsers, CompanyId?.toString()
+  shouldBeIgnore: ({ notification }) ->
+    _.includes IgnoredUsers, notification?.message?.CompanyId?.toString()
 
   delayObserver: ({ redis, app, topic, subscription }) ->
     new DelayObserver { redis, app, path: "#{topic}/#{subscription}" }

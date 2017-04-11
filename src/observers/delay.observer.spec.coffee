@@ -11,7 +11,7 @@ describe "Delay observer", ->
     observer = new DelayObserver { redis, app: "una-app", path: "un-topic/una-subscription" }
 
   it "should publish if delay changes", ->
-    observer.finish notification
+    observer.finish { notification }
     .then =>
       observer.redis.spies.publishAsync
       .withArgs "health-delay-sb/una-app/un-topic/una-subscription", '"Huge"'
@@ -19,7 +19,7 @@ describe "Delay observer", ->
 
   it "should not publish if delay did not change", ->
     observer.currentDelay = huge
-    observer.finish notification
+    observer.finish { notification }
     .then =>
       observer
       .redis.spies.publishAsync

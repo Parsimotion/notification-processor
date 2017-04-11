@@ -14,7 +14,7 @@ module.exports =
       listenTo: (emitter) ->
         emitter.on "finished", @finish
 
-      finish: (notification) =>
+      finish: ({ notification }) =>
         delay = @_messageDelay notification
         return Promise.resolve() unless delay? and @_delayChanged delay
 
