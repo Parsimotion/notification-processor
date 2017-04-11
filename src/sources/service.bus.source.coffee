@@ -9,7 +9,9 @@ IgnoredUsers = _.concat MeliUsersThanNotBelongsToProducteca, MeliUsersThanCanNot
 module.exports =
   newNotification: ({ message }) ->
     message: _.omit message, "Sent"
-    meta: insertionTime: message.Sent
+    meta:
+      insertionTime: message.Sent
+      dequeueCount: 0
     type: "sb"
 
   shouldBeIgnore: ({ notification }) ->
