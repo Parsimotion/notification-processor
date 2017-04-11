@@ -1,5 +1,6 @@
 _ = require "lodash"
 
 module.exports =
-  adapt: _.identity
+  newNotification: ({ message }) -> { message, type: "uk" }
   shouldBeIgnore: -> false
+  delayObserver: -> throw new Error "not supported `delayObserver`"

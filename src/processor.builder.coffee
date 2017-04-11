@@ -13,6 +13,9 @@ class ProcessorBuilder
 
   withSource: (@source) -> @
 
+  withDelayObserver: (opts) ->
+    @withListeners @source.delayObserver opts
+
   fromServiceBus: -> @withSource ServiceBusSource
 
   fromQueue: -> @withSource QueueSource

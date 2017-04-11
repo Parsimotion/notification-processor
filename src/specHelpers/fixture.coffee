@@ -4,12 +4,10 @@ redis =
   host: "127.0.0.1"
   port: "1234"
   db: "3"
-  auth: "unaCadenaDeAuth",
-  app: "una-app"
-  topic: "un-topic"
-  subscription: "una-subscription"
+  auth: "unaCadenaDeAuth"
 
-raw =
+notification =
+  type: "sb"
   message:
     CompanyId: 123
     ResourceId: 456
@@ -18,5 +16,5 @@ raw =
 
 module.exports = {
   redis
-  raw
+  notification
 }
