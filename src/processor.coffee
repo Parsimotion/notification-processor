@@ -11,7 +11,7 @@ module.exports =
       notification = @source.newNotification { context, message: raw }
 
       @emit "started", { context, notification }
-      if @source.shouldBeIgnore { notification }
+      if @source.shouldBeIgnored { notification }
         @emit "ignored", { context, notification }
         context.done()
         return

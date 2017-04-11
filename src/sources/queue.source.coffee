@@ -12,7 +12,7 @@ module.exports =
     meta: { insertionTime, dequeueCount }
     type: "as"
 
-  shouldBeIgnore: ({ notification }) ->
+  shouldBeIgnored: ({ notification }) ->
     _.includes IgnoredUsers, notification?.message?.user_id?.toString()
 
   delayObserver: ({ redis, app, queue }) ->

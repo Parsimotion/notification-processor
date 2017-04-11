@@ -14,7 +14,7 @@ module.exports =
       dequeueCount: 0
     type: "sb"
 
-  shouldBeIgnore: ({ notification }) ->
+  shouldBeIgnored: ({ notification }) ->
     _.includes IgnoredUsers, notification?.message?.CompanyId?.toString()
 
   delayObserver: ({ redis, app, topic, subscription }) ->
