@@ -17,3 +17,5 @@ module.exports =
 
   delayObserver: ({ redis, app, queue }) ->
     new DelayObserver { redis, app, path: queue }
+
+  deadLetterSucceeded: -> throw new Error "not supported `deadLetterSucceeded`"

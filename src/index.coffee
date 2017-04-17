@@ -3,6 +3,7 @@ module.exports =
   Observers:
     LoggerObserver: require "./observers/logger.observer"
     DelayObserver: require "./observers/delay.observer"
+    DeadLetterSucceeded: require "./observers/deadLetterSucceeded.observer"
   Processors:
     RequestProcessor: require "./processors/request.processor"
     JobProcessor: require "./processors/job"
