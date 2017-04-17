@@ -1,6 +1,7 @@
 _ = require "lodash"
 DelayObserver = require "../observers/delay.observer"
 DeadLetterSucceeded = require "../observers/deadLetterSucceeded.observer"
+DidLastRetry = require "../observers/didLastRetry.observer"
 
 MeliUsersThanNotBelongsToProducteca = process.env.MeliUsersThanNotBelongsToProducteca?.split(",") or []
 MeliUsersThanCanNotRefreshAccessToken = process.env.MeliUsersThanCanNotRefreshAccessToken?.split(",") or []
@@ -23,3 +24,6 @@ module.exports =
 
   deadLetterSucceeded: ({ redis, app, topic, subscription }) ->
     new DeadLetterSucceeded { redis, app, path: "#{topic}/#{subscription}" }
+
+  didLastRetry: ({ redis, app, topic, subscription }) ->
+    new DidLastRetry { redis, app, path: "#{topic}/#{subscription}" }

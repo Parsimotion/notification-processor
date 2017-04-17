@@ -8,6 +8,7 @@ redis =
 
 notification =
   type: "sb"
+  dequeueCount: 1
   message:
     CompanyId: 123
     ResourceId: 456
