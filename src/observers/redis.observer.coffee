@@ -18,4 +18,8 @@ module.exports =
       @redis.publishAsync @_getChannel(notification), @_buildValue_(value)
 
     _getChannel: (notification) =>
-      "health-delay-#{notification.type}/#{@_messagePath_ notification}"
+      "#{@_channelPrefix_(notification.type)}/#{@_messagePath_ notification}"
+
+    _messagePath_: -> throw new Error "not supported `_messagePath_`"
+    _buildValue_: -> throw new Error "not supported `_buildValue_`"
+    _channelPrefix_: (type) -> throw new Error "not supported `_channelPrefix_`"
