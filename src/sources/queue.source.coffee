@@ -19,3 +19,4 @@ module.exports =
     new DelayObserver { redis, app, path: queue }
 
   deadLetterSucceeded: -> throw new Error "not supported `deadLetterSucceeded`"
+  didLastRetry: -> throw new Error "not supported `didLastRetry`"

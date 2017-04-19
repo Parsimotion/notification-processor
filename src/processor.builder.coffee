@@ -19,6 +19,9 @@ class ProcessorBuilder
   withDeadLetterSucceeded: (opts) ->
     @withListeners @source.deadLetterSucceeded opts
 
+  withDidLastRetry: (opts) ->
+    @withListeners @source.didLastRetry opts
+
   fromServiceBus: -> @withSource ServiceBusSource
 
   fromQueue: -> @withSource QueueSource
