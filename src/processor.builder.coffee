@@ -16,6 +16,9 @@ class ProcessorBuilder
   withDelayObserver: (opts) ->
     @withListeners @source.delayObserver opts
 
+  withDeadLetterSucceeded: (opts) ->
+    @withListeners @source.deadLetterSucceeded opts
+
   fromServiceBus: -> @withSource ServiceBusSource
 
   fromQueue: -> @withSource QueueSource

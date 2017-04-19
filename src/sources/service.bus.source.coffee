@@ -1,5 +1,6 @@
 _ = require "lodash"
 DelayObserver = require "../observers/delay.observer"
+DeadLetterSucceeded = require "../observers/deadLetterSucceeded.observer"
 
 MeliUsersThanNotBelongsToProducteca = process.env.MeliUsersThanNotBelongsToProducteca?.split(",") or []
 MeliUsersThanCanNotRefreshAccessToken = process.env.MeliUsersThanCanNotRefreshAccessToken?.split(",") or []
@@ -19,3 +20,6 @@ module.exports =
 
   delayObserver: ({ redis, app, topic, subscription }) ->
     new DelayObserver { redis, app, path: "#{topic}/#{subscription}" }
+
+  deadLetterSucceeded: ({ redis, app, topic, subscription }) ->
+    new DeadLetterSucceeded { redis, app, path: "#{topic}/#{subscription}" }
