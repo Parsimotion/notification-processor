@@ -16,7 +16,7 @@ module.exports =
         context.done()
         return
 
-      Promise.method(@runner) notification
+      Promise.method(@runner) notification, context
       .tap => @emit "successful", { context, notification }
       .thenReturn()
       .tapCatch (err) => @emit "unsuccessful", { context, notification, err }
