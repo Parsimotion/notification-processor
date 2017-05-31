@@ -4,6 +4,8 @@ NotificationsApi = require("./notification.api")
 request = require("request-promise")
 Promise = require("bluebird")
 _ = require("lodash")
+EventEmitter = require("events").EventEmitter
+notificationsApi = null
 
 _getHeaders = (headers) ->
   _(headers)
@@ -19,6 +21,11 @@ _cleanOptions = ({Resource, Method, Body, HeadersForRequest}) ->
     headers: _getHeaders HeadersForRequest
   }, _.isUndefined
 
+emitter = new EventEmitter
+
+emitter.on "success", ({ message: { JobId }, statusCode }) -> notificationsApi.success JobId, statusCode
+emitter.on "failed", ({ message: { JobId }, statusCode, error }) -> notificationsApi.fail JobId, statusCode, error
+
 module.exports = (generateOptions) -> ({ message, meta: { dequeueCount }}) ->
   messageOptions = _cleanOptions message
   notificationsApi = new NotificationsApi messageOptions.headers["Authorization"]
@@ -26,7 +33,7 @@ module.exports = (generateOptions) -> ({ message, meta: { dequeueCount }}) ->
 
   request options
   .promise()
-  .then ({ statusCode }) -> notificationsApi.success message.JobId, statusCode
+  .tap ({ statusCode }) -> emitter.emit "success", { message, statusCode }
   .catch ({ statusCode, error }) ->
     throw { statusCode, error } unless dequeueCount >= MAX_DEQUEUE_COUNT
-    notificationsApi.fail message.JobId, statusCode, error
+    emitter.emit "failed", { message, statusCode, error }
