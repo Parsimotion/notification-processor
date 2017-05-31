@@ -38,3 +38,9 @@ jspm_packages
 
 # Ignore build
 lib
+
+# Yarn
+yarn.lock
+
+# Sublime
+*.sublime-workspace
