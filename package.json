@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "bluebird": "^3.5.0",
+    "bluebird-retry": "^0.10.1",
     "convert-units": "^2.1.0",
     "error-to-json": "^1.1.0",
     "moment": "^2.18.1",
