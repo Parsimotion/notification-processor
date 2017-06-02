@@ -6,6 +6,7 @@ process.env.MAX_DEQUEUE_COUNT = 5
 process.env.NOTIFICATIONS_API_URL = NOTIFICATIONS_URL
 process.env.API_URL = API_URL
 
+_ = require "lodash"
 nock = require "nock"
 should = require "should"
 JobsProcessor = require "./job.processor"
@@ -29,7 +30,7 @@ describe "JobsProcessor: ", ->
 
       _processJob().should.be.rejected()
 
-    it "and dequeue counter is greater than MAX_DEQUEUE_COUNT, should notify for fail to notificationsApi", (done) ->
+    it "and dequeue counter is greater than MAX_DEQUEUE_COUNT, should notify for fail to notificationsApi", ->
       errorMessage = "it's a trap!"
       badStatusCode = 400
 
@@ -41,14 +42,14 @@ describe "JobsProcessor: ", ->
       _nockAPI(badStatusCode, errorMessage)
 
       notificationsApiNock = nock NOTIFICATIONS_URL
-      .post "/jobs/#{JOB_ID}/operations", (body) -> body.should.be.eql bodyExpected
+      .post "/jobs/#{JOB_ID}/operations", (body) -> _.omit(body, "request").should.be.eql bodyExpected
       .reply 200
 
       _processJob(dequeueCount: 6)
-      setTimeout (-> notificationsApiNock.done(); done()), 100
+      .tap -> notificationsApiNock.done()
 
   context "when API response with good status code", ->
-    it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should notify for success to notificationsApi", (done) ->
+    it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should notify for success to notificationsApi", ->
       _nockAPI()
 
       notificationsApiNock = nock NOTIFICATIONS_URL
@@ -56,7 +57,7 @@ describe "JobsProcessor: ", ->
       .reply 200
 
       _processJob()
-      setTimeout (-> notificationsApiNock.done(); done()), 100
+      .tap -> notificationsApiNock.done()
 
 message =
   "Method":"POST"

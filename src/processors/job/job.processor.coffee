@@ -19,9 +19,6 @@ _cleanOptions = ({Resource, Method, Body, HeadersForRequest}) ->
     headers: _getHeaders HeadersForRequest
   }, _.isUndefined
 
-_notifySuccess = ({ message: { JobId }, statusCode }) -> notificationsApi.success JobId, statusCode
-_notifyFail = ({ message: { JobId }, statusCode, error }) -> notificationsApi.fail JobId, statusCode, error
-
 module.exports = (generateOptions) -> ({ message, meta: { dequeueCount }}) ->
   messageOptions = _cleanOptions message
   notificationsApi = new NotificationsApi messageOptions.headers["Authorization"]
@@ -29,7 +26,7 @@ module.exports = (generateOptions) -> ({ message, meta: { dequeueCount }}) ->
 
   request options
   .promise()
-  .tap ({ statusCode }) -> _notifySuccess { message, statusCode }
+  .tap ({ statusCode }) -> notificationsApi.success { message, statusCode }
   .catch ({ statusCode, error }) ->
     throw { statusCode, error } unless dequeueCount >= MAX_DEQUEUE_COUNT
-    _notifyFail { message, statusCode, error }
+    notificationsApi.fail { message, statusCode, error, request: { options } }
