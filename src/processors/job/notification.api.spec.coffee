@@ -24,10 +24,11 @@ describe "NotificationsApi", ->
     jobId = 1
     statusCode = 400
     message = "Opps!, Something went wrong"
-    bodyExpected = { statusCode, message, success: no }
+    request = request: { method: "POST", url: "/items" }
+    bodyExpected = { statusCode, message, success: no, request }
 
     nock(NOTIFICATIONS_URL)
     .post "/jobs/#{jobId}/operations", (body) -> body.should.be.eql bodyExpected
     .reply(200)
 
-    notificationsApi.fail { message: { JobId: jobId } , statusCode, error: { message } }
+    notificationsApi.fail { message: { JobId: jobId } , statusCode, error: { message }, request }

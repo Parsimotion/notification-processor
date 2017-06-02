@@ -1,17 +1,17 @@
 NOTIFICATIONS_URL = process.env.NOTIFICATIONS_API_URL
 
-request = require("request-promise")
+requestPromise = require("request-promise")
 retry = require("bluebird-retry")
 
 class NotificationsApi
   constructor: (@token) ->
 
   success: ({ message: { JobId }, statusCode }) => retry(( =>
-    request(@_makeRequest(JobId, { statusCode, success: yes }))
+    requestPromise @_makeRequest JobId, { statusCode, success: yes }
   ), { max_tries: 3 })
 
-  fail: ({ message: { JobId }, statusCode, error: { message: errorMessage } }) => retry(( =>
-    request(@_makeRequest(JobId, { statusCode, success: no, message: errorMessage }))
+  fail: ({ message, statusCode, error, request }) => retry(( =>
+    requestPromise @_makeRequest message.JobId, { statusCode, success: no, message: error.message, request }
   ), { max_tries: 3 })
 
   _makeRequest: (jobId, body) =>

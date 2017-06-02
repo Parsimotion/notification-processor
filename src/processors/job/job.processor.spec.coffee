@@ -6,6 +6,7 @@ process.env.MAX_DEQUEUE_COUNT = 5
 process.env.NOTIFICATIONS_API_URL = NOTIFICATIONS_URL
 process.env.API_URL = API_URL
 
+_ = require "lodash"
 nock = require "nock"
 should = require "should"
 JobsProcessor = require "./job.processor"
@@ -41,7 +42,7 @@ describe "JobsProcessor: ", ->
       _nockAPI(badStatusCode, errorMessage)
 
       notificationsApiNock = nock NOTIFICATIONS_URL
-      .post "/jobs/#{JOB_ID}/operations", (body) -> body.should.be.eql bodyExpected
+      .post "/jobs/#{JOB_ID}/operations", (body) -> _.omit(body, "request").should.be.eql bodyExpected
       .reply 200
 
       _processJob(dequeueCount: 6)
