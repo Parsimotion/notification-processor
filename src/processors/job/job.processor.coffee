@@ -23,8 +23,8 @@ _cleanOptions = ({Resource, Method, Body, HeadersForRequest}) ->
 
 emitter = new EventEmitter
 
-emitter.on "success", ({ message: { JobId }, statusCode }) -> notificationsApi.success JobId, statusCode
-emitter.on "failed", ({ message: { JobId }, statusCode, error }) -> notificationsApi.fail JobId, statusCode, error
+_notifySuccess = ({ message: { JobId }, statusCode }) -> notificationsApi.success JobId, statusCode
+_notifyFail = ({ message: { JobId }, statusCode, error }) -> notificationsApi.fail JobId, statusCode, error
 
 module.exports = (generateOptions) -> ({ message, meta: { dequeueCount }}) ->
   messageOptions = _cleanOptions message
@@ -33,7 +33,7 @@ module.exports = (generateOptions) -> ({ message, meta: { dequeueCount }}) ->
 
   request options
   .promise()
-  .tap ({ statusCode }) -> emitter.emit "success", { message, statusCode }
+  .tap ({ statusCode }) -> _notifySuccess { message, statusCode }
   .catch ({ statusCode, error }) ->
     throw { statusCode, error } unless dequeueCount >= MAX_DEQUEUE_COUNT
-    emitter.emit "failed", { message, statusCode, error }
+    _notifyFail { message, statusCode, error }
