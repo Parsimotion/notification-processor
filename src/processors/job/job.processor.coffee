@@ -2,9 +2,7 @@ MAX_DEQUEUE_COUNT = process.env.MAX_DEQUEUE_COUNT
 
 NotificationsApi = require("./notification.api")
 request = require("request-promise")
-Promise = require("bluebird")
 _ = require("lodash")
-EventEmitter = require("events").EventEmitter
 notificationsApi = null
 
 _getHeaders = (headers) ->
@@ -20,8 +18,6 @@ _cleanOptions = ({Resource, Method, Body, HeadersForRequest}) ->
     resource: Resource
     headers: _getHeaders HeadersForRequest
   }, _.isUndefined
-
-emitter = new EventEmitter
 
 _notifySuccess = ({ message: { JobId }, statusCode }) -> notificationsApi.success JobId, statusCode
 _notifyFail = ({ message: { JobId }, statusCode, error }) -> notificationsApi.fail JobId, statusCode, error
