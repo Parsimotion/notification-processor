@@ -4,9 +4,12 @@ _.assign process.env, NOTIFICATIONS_API_URL: NOTIFICATIONS_URL
 
 nock = require "nock"
 should = require "should"
+require "should-sinon"
+
 NotificationsApi = require "./notification.api"
 
 describe "NotificationsApi", ->
+
   notificationsApi = new NotificationsApi "randomAccessToken"
 
   it "on success: should send success: true to notificationsApi", ->
@@ -32,3 +35,14 @@ describe "NotificationsApi", ->
     .reply(200)
 
     notificationsApi.fail { message: { JobId: jobId } , statusCode, error: { message }, request }
+
+  it "ignore error if its has ocurred when call to notifications-api", ->
+    @timeout 4000
+    jobId = "123"
+
+    nock(NOTIFICATIONS_URL)
+    .post "/jobs/#{jobId}/operations"
+    .times 3
+    .reply 500
+
+    notificationsApi.success { message: { JobId: jobId }, statusCode: 200 }
