@@ -18,7 +18,7 @@ describe "NotificationsApi", ->
     .post "/jobs/#{jobId}/operations", (body) -> body.should.be.eql bodyExpected
     .reply(200)
 
-    notificationsApi.success(jobId, statusCode)
+    notificationsApi.success { message: { JobId: jobId }, statusCode }
 
   it "on fail: should send success: false with error message to notificationsApi", ->
     jobId = 1
@@ -30,4 +30,4 @@ describe "NotificationsApi", ->
     .post "/jobs/#{jobId}/operations", (body) -> body.should.be.eql bodyExpected
     .reply(200)
 
-    notificationsApi.fail(jobId, statusCode, { message })
+    notificationsApi.fail { message: { JobId: jobId } , statusCode, error: { message } }

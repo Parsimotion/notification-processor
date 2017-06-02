@@ -29,7 +29,7 @@ describe "JobsProcessor: ", ->
 
       _processJob().should.be.rejected()
 
-    it "and dequeue counter is greater than MAX_DEQUEUE_COUNT, should notify for fail to notificationsApi", (done) ->
+    it "and dequeue counter is greater than MAX_DEQUEUE_COUNT, should notify for fail to notificationsApi", ->
       errorMessage = "it's a trap!"
       badStatusCode = 400
 
@@ -45,10 +45,10 @@ describe "JobsProcessor: ", ->
       .reply 200
 
       _processJob(dequeueCount: 6)
-      setTimeout (-> notificationsApiNock.done(); done()), 100
+      .tap -> notificationsApiNock.done()
 
   context "when API response with good status code", ->
-    it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should notify for success to notificationsApi", (done) ->
+    it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should notify for success to notificationsApi", ->
       _nockAPI()
 
       notificationsApiNock = nock NOTIFICATIONS_URL
@@ -56,7 +56,7 @@ describe "JobsProcessor: ", ->
       .reply 200
 
       _processJob()
-      setTimeout (-> notificationsApiNock.done(); done()), 100
+      .tap -> notificationsApiNock.done()
 
 message =
   "Method":"POST"

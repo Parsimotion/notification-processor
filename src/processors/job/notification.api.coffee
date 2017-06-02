@@ -5,8 +5,14 @@ retry = require("bluebird-retry")
 
 class NotificationsApi
   constructor: (@token) ->
-  success: (jobId, statusCode) => retry(( => request(@_makeRequest(jobId, { statusCode, success: yes }))), { max_tries: 3 })
-  fail: (jobId, statusCode, { message }) => retry(( => request(@_makeRequest(jobId, { statusCode, success: no, message }))), { max_tries: 3 })
+
+  success: ({ message: { JobId }, statusCode }) => retry(( =>
+    request(@_makeRequest(JobId, { statusCode, success: yes }))
+  ), { max_tries: 3 })
+
+  fail: ({ message: { JobId }, statusCode, error: { message: errorMessage } }) => retry(( =>
+    request(@_makeRequest(JobId, { statusCode, success: no, message: errorMessage }))
+  ), { max_tries: 3 })
 
   _makeRequest: (jobId, body) =>
     url: "#{NOTIFICATIONS_URL}/jobs/#{jobId}/operations"
