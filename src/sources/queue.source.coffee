@@ -1,10 +1,15 @@
 _ = require "lodash"
 DelayObserver = require "../observers/delay.observer"
+DeadLetterSucceeded = require "../observers/deadLetterSucceeded.observer"
+DidLastRetry = require "../observers/didLastRetry.observer"
 
 MeliUsersThanNotBelongsToProducteca = process.env.MeliUsersThanNotBelongsToProducteca?.split(",") or []
 MeliUsersThanCanNotRefreshAccessToken = process.env.MeliUsersThanCanNotRefreshAccessToken?.split(",") or []
 
 IgnoredUsers = _.concat MeliUsersThanNotBelongsToProducteca, MeliUsersThanCanNotRefreshAccessToken
+
+create = (Type) -> ({ redis, app, queue }) ->
+  new Type { redis, app, path: "#{queue}" }
 
 module.exports =
   newNotification: ({ context: { bindingData : { insertionTime, dequeueCount } }, message }) ->
@@ -15,8 +20,6 @@ module.exports =
   shouldBeIgnored: ({ notification }) ->
     _.includes IgnoredUsers, notification?.message?.user_id?.toString()
 
-  delayObserver: ({ redis, app, queue }) ->
-    new DelayObserver { redis, app, path: queue }
-
-  deadLetterSucceeded: -> throw new Error "not supported `deadLetterSucceeded`"
-  didLastRetry: -> throw new Error "not supported `didLastRetry`"
+  delayObserver: create DelayObserver
+  deadLetterSucceeded: create DeadLetterSucceeded
+  didLastRetry: create DidLastRetry
