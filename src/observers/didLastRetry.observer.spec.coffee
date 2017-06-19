@@ -12,7 +12,11 @@ require "should-sinon"
 
 describe "Did Last Retry observer", ->
   beforeEach ->
-    observer = new DidLastRetry { redis, app: "una-app", path: "un-topic/una-subscription" }
+    sender =
+      user: ({ message: { CompanyId } }) -> CompanyId
+      resource: ({ message: { ResourceId } }) -> ResourceId
+
+    observer = new DidLastRetry { redis, app: "una-app", path: "un-topic/una-subscription", sender }
 
   it "should publish if a failed mesasge is on its last retry", ->
     error = "hubo un error"
