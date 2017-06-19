@@ -2,6 +2,7 @@ _ = require "lodash"
 Processor = require "./processor"
 logger = require "./observers/logger.observer"
 { UnknownSource, ServiceBusSource, QueueSource } = require "./sources"
+{ MeliSender, ProductecaSender } = require "./senders"
 
 class ProcessorBuilder
 
@@ -13,18 +14,26 @@ class ProcessorBuilder
 
   withSource: (@source) -> @
 
+  withSender: (@sender) -> @
+
   withDelayObserver: (opts) ->
     @withListeners @source.delayObserver opts
 
   withDeadLetterSucceeded: (opts) ->
-    @withListeners @source.deadLetterSucceeded opts
+    throw new Error "Sender is required" unless @sender?
+    @withListeners @source.deadLetterSucceeded _.defaults(opts, { @sender })
 
   withDidLastRetry: (opts) ->
-    @withListeners @source.didLastRetry opts
+    throw new Error "Sender is required" unless @sender?
+    @withListeners @source.didLastRetry _.defaults(opts, { @sender })
 
   fromServiceBus: -> @withSource ServiceBusSource
 
   fromQueue: -> @withSource QueueSource
+
+  fromMeli: -> @withSender MeliSender
+
+  fromProducteca: -> @withSender ProductecaSender
 
   withFunction: (@command) -> @
 
