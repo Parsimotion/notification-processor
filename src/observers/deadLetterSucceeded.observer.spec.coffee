@@ -11,7 +11,11 @@ require "should-sinon"
 
 describe "Dead Letter Succeeded observer", ->
   beforeEach ->
-    observer = new DeadLetterSucceeded { redis, app: "una-app", path: "un-topic/una-subscription" }
+    sender =
+      user: ({ message: { CompanyId } }) -> CompanyId
+      resource: ({ message: { ResourceId } }) -> ResourceId
+
+    observer = new DeadLetterSucceeded { redis, app: "una-app", path: "un-topic/una-subscription", sender }
 
   it "should publish if a dead letter message runs successfully", ->
     observer.success { notification }
