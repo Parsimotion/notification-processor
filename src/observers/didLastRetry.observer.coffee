@@ -14,8 +14,8 @@ module.exports =
         @publish notification, { success: false, error }
       else Promise.resolve()
 
-    _messagePath_: (notification) ->
+    _messagePath_: (notification) =>
       "#{@app}/#{@sender.user(notification)}/#{@path}/#{@sender.resource(notification)}"
 
-    _channelPrefix_: (type) -> "health-message-#{type}"
+    _channelPrefix_: (type) => "health-message-#{type}"
     _buildValue_: JSON.stringify
