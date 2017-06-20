@@ -8,8 +8,9 @@ MeliUsersThanCanNotRefreshAccessToken = process.env.MeliUsersThanCanNotRefreshAc
 
 IgnoredUsers = _.concat MeliUsersThanNotBelongsToProducteca, MeliUsersThanCanNotRefreshAccessToken
 
-create = (Type) -> ({ redis, app, topic, subscription }) ->
-  new Type { redis, app, path: "#{topic}/#{subscription}" }
+create = (Type) -> (opts) ->
+  { topic, subscription } = opts
+  new Type _(opts).omit([ "topic", "subscription" ]).defaults(path: "#{topic}/#{subscription}").value()
 
 
 module.exports =

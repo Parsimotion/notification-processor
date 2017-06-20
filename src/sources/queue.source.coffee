@@ -8,8 +8,10 @@ MeliUsersThanCanNotRefreshAccessToken = process.env.MeliUsersThanCanNotRefreshAc
 
 IgnoredUsers = _.concat MeliUsersThanNotBelongsToProducteca, MeliUsersThanCanNotRefreshAccessToken
 
-create = (Type) -> ({ redis, app, queue }) ->
-  new Type { redis, app, path: "#{queue}" }
+create = (Type) -> (opts) ->
+  { queue } = opts
+  new Type _(opts).omit([ "queue" ]).defaults(path: "#{queue}").value()
+
 
 module.exports =
   newNotification: ({ context: { bindingData : { insertionTime, dequeueCount } }, message }) ->
