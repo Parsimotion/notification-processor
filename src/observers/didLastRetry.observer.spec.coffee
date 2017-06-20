@@ -3,16 +3,18 @@ require "../specHelpers/redis.observer.mock"
 { redis, notification } = require "../specHelpers/fixture"
 
 _ = require "lodash"
-DidLastRetry = require "./didLastRetry.observer"
 should = require "should"
-Promise = require "bluebird"
 require "should-sinon"
 
-{ observer } = {}
+DidLastRetry = require "./didLastRetry.observer"
+Sender = require "../senders/producteca.sender"
 
 describe "Did Last Retry observer", ->
+
+  { observer } = {}
+
   beforeEach ->
-    observer = new DidLastRetry { redis, app: "una-app", path: "un-topic/una-subscription" }
+    observer = new DidLastRetry { redis, app: "una-app", path: "un-topic/una-subscription", sender: Sender }
 
   it "should publish if a failed mesasge is on its last retry", ->
     error = "hubo un error"
