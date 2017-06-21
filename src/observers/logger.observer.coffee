@@ -8,8 +8,8 @@ module.exports =
     observable.on "successful", ({ context: { log } }) ->
       log "Process successful"
 
-    observable.on "unsuccessful", ({ context: { log }, err }) ->
-      log "Process unsuccessful", errorToJson(err)
+    observable.on "unsuccessful", ({ context: { log }, error }) ->
+      log "Process unsuccessful", errorToJson(error)
 
     observable.on "finished", ({ context: { log } }) ->
       log "Process finished"
