@@ -11,7 +11,7 @@ module.exports =
 
     error: ({ notification, error }) =>
       if notification.meta.dequeueCount >= @maxDeliveryCount
-        @publish notification, { success: false, error }
+        @publish notification, { success: false, value: { error } }
       else Promise.resolve()
 
     _messagePath_: (notification) =>

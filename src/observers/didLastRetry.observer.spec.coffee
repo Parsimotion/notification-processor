@@ -25,7 +25,7 @@ describe "Did Last Retry observer", ->
       .redis.spies.publishAsync
       .should.be.calledOnce()
       .and
-      .calledWith "health-message-sb/una-app/123/un-topic/una-subscription/456", JSON.stringify { "success":false, "error":"hubo un error" }
+      .calledWith "health-message-sb/una-app/123/un-topic/una-subscription/456", JSON.stringify { "success":false, value: { error: "hubo un error" } }
 
   it "should not publish if a failed message is not on its last retry", ->
     observer.error { notification }
