@@ -11,8 +11,5 @@ module.exports =
     observable.on "unsuccessful", ({ context: { log }, notification, error }) ->
       log.error "Process unsuccessful", { notification, error: errorToJson(error) }
 
-    observable.on "finished", ({ context: { log }, notification }) ->
-      log.info "Process finished", { notification }
-
     observable.on "ignored", ({ context: { log }, notification }) ->
       log.verbose "Message ignored", { notification }
