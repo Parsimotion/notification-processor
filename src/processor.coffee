@@ -1,6 +1,7 @@
 _ = require "lodash"
 EventEmitter = require "events"
 Promise = require "bluebird"
+uuid = require "uuid/v4"
 
 ENABLE_EVENTS = process.env.ENABLE_EVENTS isnt "false"
 
@@ -10,19 +11,20 @@ module.exports =
     constructor: ({ @source, @runner }) ->
 
     process: (context, raw) =>
-      notification = @source.newNotification { context, message: raw }
+      id = uuid()
+      notification = @source.newNotification { context, id, message: raw }
 
-      @_emitEvent "started", { context, notification }
+      @_emitEvent "started", { context, id, notification }
       if @source.shouldBeIgnored { notification }
-        @_emitEvent "ignored", { context, notification }
+        @_emitEvent "ignored", { context, id, notification }
         context.done()
         return
 
       Promise.method(@runner) notification, context
-      .tap => @_emitEvent "successful", { context, notification }
+      .tap => @_emitEvent "successful", { context, id, notification }
       .thenReturn()
-      .tapCatch (error) => @_emitEvent "unsuccessful", { context, notification, error }
-      .finally => @_emitEvent "finished", { context, notification }
+      .tapCatch (error) => @_emitEvent "unsuccessful", { context, id, notification, error}
+      .finally => @_emitEvent "finished", { context, id, notification }
       .asCallback context.done
 
       return

@@ -2,14 +2,14 @@ errorToJson = require "error-to-json"
 
 module.exports =
   listenTo: (observable) ->
-    observable.on "started", ({ context: { log }, notification }) ->
-      log.info "A new message has been received", { notification }
+    observable.on "started", ({ context: { log }, notification, id }) ->
+      log.info "A new message has been received", { id, notification }
 
-    observable.on "successful", ({ context: { log }, notification }) ->
-      log.info "Process successful", { notification }
+    observable.on "successful", ({ context: { log }, id }) ->
+      log.info "Process successful", { id }
 
-    observable.on "unsuccessful", ({ context: { log }, notification, error }) ->
-      log.error "Process unsuccessful", { notification, error: errorToJson(error) }
+    observable.on "unsuccessful", ({ context: { log }, id, error }) ->
+      log.error "Process unsuccessful", { id, error: errorToJson(error) }
 
-    observable.on "ignored", ({ context: { log }, notification }) ->
-      log.verbose "Message ignored", { notification }
+    observable.on "ignored", ({ context: { log }, id }) ->
+      log.verbose "Message ignored", { id }
