@@ -1,3 +1,4 @@
+_ = require "lodash"
 RedisObserver = require "./redis.observer"
 errorToJson = require "error-to-json"
 
@@ -12,7 +13,8 @@ module.exports =
 
     error: ({ notification, error }) =>
       if notification.meta.dequeueCount >= @maxDeliveryCount
-        @publish notification, { success: false, value: { error: errorToJson error } }
+        error = errorToJson error unless _.isString(error)
+        @publish notification, { success: false, value: { error } }
       else Promise.resolve()
 
     _messagePath_: (notification) =>

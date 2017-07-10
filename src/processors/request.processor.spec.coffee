@@ -36,7 +36,7 @@ describe "RequestProcessor", ->
     spy = sinon.spy RequestProcessor req
 
     spy MESSAGE
-    .should.be.rejectedWith errors.StatusCodeError
+    .should.be.rejected()
     .tap -> nockDomain.done()
     .tap -> spy.should.be.calledWith MESSAGE
 
