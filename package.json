@@ -12,15 +12,16 @@
     "url": "git+https://github.com/Parsimotion/notification-processor.git"
   },
   "dependencies": {
+    "azure-table-node": "^1.5.0",
     "bluebird": "^3.5.0",
     "bluebird-retry": "^0.10.1",
     "convert-units": "^2.1.0",
     "error-to-json": "^1.1.0",
     "moment": "^2.18.1",
-    "node-uuid": "^1.4.8",
     "redis": "^2.7.1",
     "request": "^2.81.0",
-    "request-promise": "^4.2.0"
+    "request-promise": "^4.2.0",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
     "bluebird": "3.5.0",

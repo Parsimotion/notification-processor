@@ -7,3 +7,4 @@ module.exports =
   Processors:
     RequestProcessor: require "./processors/request.processor"
     JobProcessor: require "./processors/job"
+    DeadletterProcessor: require "./processors/deadletter"
