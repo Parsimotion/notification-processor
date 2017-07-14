@@ -14,11 +14,11 @@ create = (Type) -> (opts) ->
 
 
 module.exports =
-  newNotification: ({ message }) ->
+  newNotification: ({ context: { bindingData : { enqueuedTimeUtc, deliveryCount } }, message }) ->
     message: _.omit message, "Sent"
     meta:
-      insertionTime: message.Sent
-      dequeueCount: 0
+      insertionTime: enqueuedTimeUtc
+      dequeueCount: deliveryCount
     type: "sb"
 
   shouldBeIgnored: ({ notification }) ->
