@@ -15,11 +15,6 @@ module.exports =
       notification = @source.newNotification { context, id, message: raw }
 
       @_emitEvent "started", { context, id, notification }
-      if @source.shouldBeIgnored { notification }
-        @_emitEvent "ignored", { context, id, notification }
-        context.done()
-        return
-
       Promise.method(@runner) notification, context
       .tap => @_emitEvent "successful", { context, id, notification }
       .thenReturn()
