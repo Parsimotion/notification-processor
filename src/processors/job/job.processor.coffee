@@ -28,5 +28,5 @@ module.exports = (generateOptions) -> ({ message, meta: { dequeueCount }}) ->
   .promise()
   .tap ({ statusCode }) -> notificationsApi.success { message, statusCode }
   .catch ({ statusCode, error }) ->
-    throw { statusCode, error } unless dequeueCount >= MAX_DEQUEUE_COUNT
+    throw { statusCode, error } unless dequeueCount >= MAX_DEQUEUE_COUNT or statusCode is 400
     notificationsApi.fail { message, statusCode, error, request: { options } }
