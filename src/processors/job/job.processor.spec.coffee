@@ -19,6 +19,17 @@ OptionsGenerator = ({ resource, method, body, headers }) ->
     json: body
   }
 
+mockFailedNotificationWith = (badStatusCode) ->
+  errorMessage = "it's a trap!"
+  bodyExpected =
+    statusCode: badStatusCode
+    message: errorMessage
+    success: no
+
+  _nockAPI badStatusCode, errorMessage
+  _notificationsApiNock bodyExpected
+
+
 _notificationsApiNock = (bodyExpected) ->
   nock NOTIFICATIONS_URL
     .post "/jobs/#{JOB_ID}/operations", (body) -> _.omit(body, "request").should.be.eql bodyExpected
@@ -32,36 +43,15 @@ describe "JobsProcessor: ", ->
   context "when API response with bad status code", ->
     it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should throw an exception", ->
       _nockAPI(500, "something went wrong!")
-
       _processJob().should.be.rejected()
 
     it "and dequeue counter is greater than MAX_DEQUEUE_COUNT, should notify for fail to notificationsApi", ->
-      errorMessage = "it's a trap!"
-      badStatusCode = 500
-
-      bodyExpected =
-        statusCode: badStatusCode
-        message: errorMessage
-        success: no
-
-      _nockAPI badStatusCode, errorMessage
-
-      _notificationsApiNock bodyExpected
-
+      mockFailedNotificationWith 500
       _processJob(dequeueCount: 6)
       .tap -> nock.isDone().should.be.ok()
 
     it "equal to 400 then is success but should notify for fail to notificationsApi", ->
-      errorMessage = "it's a trap!"
-      badStatusCode = 400
-
-      bodyExpected =
-        statusCode: badStatusCode
-        message: errorMessage
-        success: no
-
-      _nockAPI badStatusCode, errorMessage
-      _notificationsApiNock bodyExpected
+      mockFailedNotificationWith 400
 
       _processJob()
       .tap -> nock.isDone().should.be.ok()
