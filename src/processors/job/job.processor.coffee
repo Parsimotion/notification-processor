@@ -19,7 +19,7 @@ _cleanOptions = ({Resource, Method, Body, HeadersForRequest}) ->
     headers: _getHeaders HeadersForRequest
   }, _.isUndefined
 
-module.exports = (generateOptions) -> ({ message, meta: { dequeueCount }}) ->
+module.exports = (generateOptions, nonRetryable = [400]) -> ({ message, meta: { dequeueCount }}) ->
   messageOptions = _cleanOptions message
   notificationsApi = new NotificationsApi messageOptions.headers["Authorization"]
   options = _.merge {}, generateOptions(messageOptions), resolveWithFullResponse: yes
@@ -28,5 +28,5 @@ module.exports = (generateOptions) -> ({ message, meta: { dequeueCount }}) ->
   .promise()
   .tap ({ statusCode }) -> notificationsApi.success { message, statusCode }
   .catch ({ statusCode, error }) ->
-    throw { statusCode, error } unless dequeueCount >= MAX_DEQUEUE_COUNT
+    throw { statusCode, error } unless dequeueCount >= MAX_DEQUEUE_COUNT or statusCode in nonRetryable
     notificationsApi.fail { message, statusCode, error, request: { options } }
