@@ -30,3 +30,4 @@ module.exports = (generateOptions, nonRetryable = [400]) -> ({ message, meta: { 
   .catch ({ statusCode, error }) ->
     throw { statusCode, error } unless dequeueCount >= MAX_DEQUEUE_COUNT or statusCode in nonRetryable
     notificationsApi.fail { message, statusCode, error, request: { options } }
+  .thenReturn()
