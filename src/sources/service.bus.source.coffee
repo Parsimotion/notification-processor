@@ -9,11 +9,12 @@ create = (Type) -> (opts) ->
 
 
 module.exports =
-  newNotification: ({ context: { bindingData : { enqueuedTimeUtc, deliveryCount } }, message }) ->
+  newNotification: ({ context: { bindingData : { enqueuedTimeUtc, deliveryCount, properties } }, message }) ->
     message: _.omit message, "Sent"
     meta:
       insertionTime: enqueuedTimeUtc
       dequeueCount: deliveryCount
+      properties: properties
     type: "sb"
 
   delayObserver: create DelayObserver
