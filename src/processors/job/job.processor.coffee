@@ -3,7 +3,6 @@ MAX_DEQUEUE_COUNT = process.env.MAX_DEQUEUE_COUNT
 NotificationsApi = require("./notification.api")
 request = require("request-promise")
 _ = require("lodash")
-notificationsApi = null
 
 _getHeaders = (headers) ->
   _(headers)
