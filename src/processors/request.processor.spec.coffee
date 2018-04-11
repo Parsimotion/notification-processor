@@ -3,6 +3,7 @@ should = require "should"
 sinon = require "sinon"
 require "should-sinon"
 errors = require "request-promise/errors";
+Promise = require "bluebird"
 
 RequestProcessor = require "./request.processor"
 
@@ -45,6 +46,15 @@ describe "RequestProcessor", ->
     spy = sinon.spy RequestProcessor req, { silentErrors: [ 409 ] }
 
     spy MESSAGE
+    .should.be.fulfilled()
+    .tap -> nockDomain.done()
+    .tap -> spy.should.be.calledWith MESSAGE
+
+  it "should do a POST request event if is called with a promise and it should be successful", ->
+    nockDomain = nockStub().reply 200, {}
+    spy = sinon.spy => Promise.resolve req()
+
+    RequestProcessor(spy)(MESSAGE)
     .should.be.fulfilled()
     .tap -> nockDomain.done()
     .tap -> spy.should.be.calledWith MESSAGE
