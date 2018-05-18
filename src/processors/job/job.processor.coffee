@@ -26,7 +26,7 @@ module.exports = (generateOptions, nonRetryable = [400]) -> ({ message, meta: { 
   request options
   .promise()
   .tap ({ statusCode }) -> notificationsApi.success { message, statusCode }
-  .catch ({ statusCode, error }) ->
+  .catch ({ statusCode, error = { message: "unknown_error" } }) ->
     throw { statusCode, error } unless dequeueCount >= MAX_DEQUEUE_COUNT or statusCode in nonRetryable
     notificationsApi.fail { message, statusCode, error, request: { options } }
   .thenReturn()
