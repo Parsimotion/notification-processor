@@ -1,32 +1,34 @@
-MAX_DEQUEUE_COUNT = process.env.MAX_DEQUEUE_COUNT
-
 NotificationsApi = require("./notification.api")
+MaxRetriesProcessor = require("../maxRetries.processor")
 request = require("request-promise")
 _ = require("lodash")
 
-_getHeaders = (headers) ->
-  _(headers)
-    .map ({ Key, Value }) -> [ Key, Value ]
-    .fromPairs()
-    .value()
+module.exports =
+  class JobProcessor extends MaxRetriesProcessor
 
-_cleanOptions = ({Resource, Method, Body, HeadersForRequest}) ->
-  _.omitBy {
-    method: Method
-    body: Body
-    resource: Resource
-    headers: _getHeaders HeadersForRequest
-  }, _.isUndefined
+    constructor: (args) ->
+      super args
+      @nonRetryable = args.nonRetryable
 
-module.exports = (generateOptions, nonRetryable = [400]) -> ({ message, meta: { dequeueCount }}) ->
-  messageOptions = _cleanOptions message
-  notificationsApi = new NotificationsApi messageOptions.headers["Authorization"]
-  options = _.merge {}, generateOptions(messageOptions), resolveWithFullResponse: yes
+    process: (notification) ->
+      super(notification).thenReturn()
 
-  request options
-  .promise()
-  .tap ({ statusCode }) -> notificationsApi.success { message, statusCode }
-  .catch ({ statusCode, error }) ->
-    throw { statusCode, error } unless dequeueCount >= MAX_DEQUEUE_COUNT or statusCode in nonRetryable
-    notificationsApi.fail { message, statusCode, error, request: { options } }
-  .thenReturn()
+    _onSuccess_: ({ message }, { statusCode }) =>
+      @_notificationsApi(message).success { message, statusCode }
+
+    _shouldRetry_: (notification, err) =>
+      super(notification, err) and err?.detail?.response?.statusCode not in @nonRetryable
+
+    _sanitizeError_: (err) =>
+      _.pick err, ["statusCode", "error"]
+
+    _onMaxRetryExceeded_: ({ message }, error) =>
+      @_notificationsApi(message).fail {
+        message
+        statusCode: error.detail.response.statusCode
+        error
+        request: _.omit error.detail.request, ["resolveWithFullResponse"]
+      }
+
+    _notificationsApi: ({ headers }) =>
+      new NotificationsApi headers["Authorization"]

@@ -9,9 +9,9 @@ process.env.API_URL = API_URL
 _ = require "lodash"
 nock = require "nock"
 should = require "should"
-JobsProcessor = require "./job.processor"
+JobsProcessor = require "./index"
 
-OptionsGenerator = ({ resource, method, body, headers }) ->
+OptionsGenerator = ({ message: { resource, method, body, headers } }) ->
   {
     url: "#{API_URL}#{resource}"
     method
@@ -84,7 +84,7 @@ message =
 _createJobNotification = (meta) -> { message, meta }
 
 _processJob = (meta = { dequeueCount: 1 }) ->
-  processor = JobsProcessor OptionsGenerator
+  processor = JobsProcessor { buildOpts: OptionsGenerator }
   job = _createJobNotification meta
 
   processor job
