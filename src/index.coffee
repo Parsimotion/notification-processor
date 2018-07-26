@@ -9,3 +9,4 @@ module.exports =
     JobProcessor: require "./processors/job"
     DeadletterProcessor: require "./processors/deadletter"
   Sources: require "./sources"
+  Senders: require "./senders"

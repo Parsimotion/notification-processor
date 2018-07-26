@@ -1,12 +1,16 @@
+DeadletterProcessor = require("./deadletter.processor")
+
 module.exports =
-  ({ connection, table = "poison", name, rowKeyGenerator, maxDequeueCount = 1 }, processor) ->
-    processor = new DeadletterProcessor
+  ({ connection, table = "poison", name, sender, maxDequeueCount = 1 }, processor) ->
+    processor = new DeadletterProcessor {
       processor
+      sender
       maxRetries: maxDequeueCount
-      storage:
+      storage: {
         table
         connection
         name
-        rowKeyGenerator
+      }
+    }
 
-    (it) -> jobProcesor.process it
+    (it) -> processor.process it

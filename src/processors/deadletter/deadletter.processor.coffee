@@ -8,20 +8,20 @@ module.exports =
 
     constructor: (args) ->
       super args
-      @table = args.storage.table 
-      @name = args.storage.name
-      @rowKeyGenerator = args.storage.rowKeyGenerator
+      { @sender, storage: { @table, @name, connection }} = args
       @client = @_buildClient azureTable.parseAccountString args.storage.connection
       
     _onSuccess_: (notification, result) ->
     
     _sanitizeError_: (err) -> err
     
-    _onMaxRetryExceeded_: (notification, err) -> 
+    _onMaxRetryExceeded_: (notification, err) ->
       @client.insertOrReplaceEntityAsync @table, {
         PartitionKey: encodeURIComponent @name
-        RowKey: encodeURIComponent @rowKeyGenerator notification.message
+        RowKey: encodeURIComponent @sender.resource notification
+        user: encodeURIComponent @sender.user notification
         notification: JSON.stringify notification
+        error: JSON.stringify err
       }
 
     _buildClient: (connection) ->
