@@ -21,7 +21,7 @@ describe "NotificationsApi", ->
     .post "/jobs/#{jobId}/operations", (body) -> body.should.be.eql bodyExpected
     .reply(200)
 
-    notificationsApi.success { message: { JobId: jobId }, statusCode }
+    notificationsApi.success { message: { jobId }, statusCode }
 
   it "on fail: should send success: false with error message to notificationsApi", ->
     jobId = 1
@@ -34,7 +34,7 @@ describe "NotificationsApi", ->
     .post "/jobs/#{jobId}/operations", (body) -> body.should.be.eql bodyExpected
     .reply(200)
 
-    notificationsApi.fail { message: { JobId: jobId } , statusCode, error: { message }, request }
+    notificationsApi.fail { message: { jobId } , statusCode, error: { message }, request }
 
   it "ignore error if its has ocurred when call to notifications-api", ->
     @timeout 4000
@@ -45,4 +45,4 @@ describe "NotificationsApi", ->
     .times 3
     .reply 500
 
-    notificationsApi.success { message: { JobId: jobId }, statusCode: 200 }
+    notificationsApi.success { message: { jobId }, statusCode: 200 }

@@ -2,19 +2,21 @@
 
 [![NPM version](https://badge.fury.io/js/notification-processor.png)](http://badge.fury.io/js/notification-processor)
 
-[Installation instructions](https://github.com/Parsimotion/notification-processor/wiki/Installation-Instructions)
+# Migrating 1.x -> 2.x
 
-# Publish instructions
+## Job Processor
+```JavaScript
 
-``` Console
-> grunt bump:[patch|minor|major]
-> npm install . -g 
+// 1.x
+const buildOpts = (message) => { return ....  }
+const processor = JobsProcessor buildOpts, nonRetryable
+
+// 2.x
+const buildOpts = ({ message }) => { return ...... }
+const processor = JobsProcessor {
+    buildOpts: optionsGenerator,
+    maxRetries,
+    nonRetryable
+}
 ```
-Test your package in some project and make sure it works.
-When you are absolutely sure
 
-``` Console
-> git push origin master
-> git push origin master --tags
-> npm publish
-```

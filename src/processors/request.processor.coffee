@@ -7,7 +7,7 @@ MESSAGE_PROPERTIES = ["reason", "error", "message"]
 _retrieveMessage = (message) ->
   if _.isString(message) then message else null
 
-_safeParse = (raw) -> try JSON.parse raw
+_safeParse = (raw) ->  if _.isObject(raw) then raw else try JSON.parse raw
 
 module.exports = (requestGenerator, { silentErrors = [] } = {}) -> (notification) ->
   __isSilentError = (err) ->
