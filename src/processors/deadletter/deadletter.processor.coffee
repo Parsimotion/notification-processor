@@ -22,6 +22,7 @@ module.exports =
         user: encodeURIComponent @sender.user notification
         notification: JSON.stringify notification
         error: JSON.stringify err
+        type: _.get(err, "message") or "unknown_error"
       }
 
     _buildClient: (connection) ->
