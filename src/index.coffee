@@ -8,5 +8,6 @@ module.exports =
     RequestProcessor: require "./processors/request.processor"
     JobProcessor: require "./processors/job"
     DeadletterProcessor: require "./processors/deadletter"
+    MaxRetriesProcessor: require "./processors/maxRetries.processor"
   Sources: require "./sources"
   Senders: require "./senders"
