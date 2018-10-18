@@ -2,6 +2,7 @@ _ = require "lodash"
 Promise = require "bluebird";
 request = require "request-promise"
 { StatusCodeError, RequestError } = require "request-promise/errors"
+httpStatus = require("http").STATUS_CODES
 MESSAGE_PROPERTIES = ["reason", "error", "message"]
 
 _retrieveMessage = (message) ->
@@ -20,7 +21,7 @@ module.exports = (requestGenerator, { silentErrors = [] } = {}) -> (notification
     .catch __isSilentError, (err) -> _.omit err, "response"
     .catch StatusCodeError, ({ statusCode, error }) ->
       throw
-        message: _(_safeParse error).pick(MESSAGE_PROPERTIES).values().map(_retrieveMessage).compact().head()
+        message: _(_safeParse error).pick(MESSAGE_PROPERTIES).values().concat(httpStatus[statusCode]).map(_retrieveMessage).compact().head()
         detail: response: { statusCode, body: error }
     .catch RequestError, ({ cause }) ->
       throw
