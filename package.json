@@ -1,6 +1,6 @@
 {
   "name": "notification-processor",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "notification-processor",
   "main": "index.js",
   "scripts": {
