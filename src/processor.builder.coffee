@@ -16,6 +16,8 @@ class ProcessorBuilder
 
   withSender: (@sender) -> @
 
+  withTimeout: (@timeout) -> @
+
   withDelayObserver: (opts) ->
     @withListeners @source.delayObserver opts
 
@@ -45,7 +47,7 @@ class ProcessorBuilder
     @
 
   build: ->
-    processor = new Processor { @source, runner: @command }
+    processor = new Processor { @source, runner: @command, @timeout }
     _.forEach @listeners, (listener) ->
       listener.listenTo processor
 

@@ -1,6 +1,7 @@
 _ = require "lodash"
 ProcessorBuilder = require "./processor.builder"
 should = require "should"
+Promise = require "bluebird"
 
 statusAsync = (expectedStatus, done) -> (err) ->
   resolved = not err?
@@ -10,11 +11,14 @@ azureContext = (verifier) ->
   log: console.log
   done: verifier
 
-doWith = (verifier, fn) ->
+createProcessor = (fn) ->
   ProcessorBuilder.create()
     .withFunction fn
     .build()
-    .process azureContext(verifier), {}
+
+doWith = (verifier, fn) ->
+  createProcessor fn
+  .process azureContext(verifier), {}
 
 describe "Promise - Processor", ->
 
@@ -33,3 +37,18 @@ describe "Promise - Processor", ->
 
     it "Returns a unsuccessful promise", (done) ->
       doWith statusAsync(false, done), -> Promise.reject new Error
+
+  describe "using timeout", ->
+
+    { processor } = { }
+
+    beforeEach ->
+      processor = createProcessor -> Promise.delay 25
+
+    it "should success if processor is resolved before timeout", (done) ->
+      processor.timeout = 50
+      processor.process azureContext(statusAsync(true, done)), {}
+
+    it "should fail if processor is resolved after timeout", (done) ->
+      processor.timeout = 10
+      processor.process azureContext(statusAsync(false, done)), {}

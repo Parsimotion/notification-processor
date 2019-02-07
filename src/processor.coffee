@@ -8,16 +8,19 @@ ENABLE_EVENTS = process.env.ENABLE_EVENTS isnt "false"
 module.exports =
   class Processor extends EventEmitter
 
-    constructor: ({ @source, @runner }) -> super()
+    constructor: ({ @source, @runner, @timeout }) -> super()
 
     process: (context, raw) =>
       id = uuid()
       notification = @source.newNotification { context, id, message: raw }
 
       @_emitEvent "started", { context, id, notification }
-      Promise.method(@runner) notification, context
+      $promise = Promise.method(@runner) notification, context
+      $promise = $promise.timeout(@timeout, "processor timeout") if @timeout?
+
+      $promise
       .tap => @_emitEvent "successful", { context, id, notification }
-      .tapCatch (error) => @_emitEvent "unsuccessful", { context, id, notification, error}
+      .tapCatch (error) => @_emitEvent "unsuccessful", { context, id, notification, error }
       .finally => @_emitEvent "finished", { context, id, notification }
       .asCallback context.done
 
