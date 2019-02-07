@@ -8,7 +8,7 @@ module.exports =
     observable.on "successful", ({ context: { log }, id }) ->
       log.info "Process successful", { id }
 
-    observable.on "unsuccessful", ({ context: { log }, id, error }) ->
+    observable.on "unsuccessful", ({ context: { log }, id, notification, error }) ->
       log.error "Process unsuccessful", { id, notification: JSON.stringify(notification), error: JSON.stringify(errorToJson(error)) }
 
     observable.on "ignored", ({ context: { log }, id }) ->
