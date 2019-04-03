@@ -2,8 +2,6 @@ _ = require("lodash")
 JobProcessor = require "./job.processor"
 RequestProcessor = require "../request.processor"
 
-MAX_DEQUEUE_COUNT = process.env.MAX_DEQUEUE_COUNT
-
 _normalizeHeaders = (headers) ->
   _(headers)
     .map ({ Key, Value }) -> [ Key, Value ]
