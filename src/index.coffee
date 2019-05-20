@@ -6,6 +6,7 @@ module.exports =
     DeadLetterSucceeded: require "./observers/deadLetterSucceeded.observer"
   Processors:
     RequestProcessor: require "./processors/request.processor"
+    RequestAsyncProcessor: require "./processors/request.async.processor"
     JobProcessor: require "./processors/job"
     DeadletterProcessor: require "./processors/deadletter"
     MaxRetriesProcessor: require "./processors/maxRetries.processor"
