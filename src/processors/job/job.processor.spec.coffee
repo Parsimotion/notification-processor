@@ -1,23 +1,13 @@
-NOTIFICATIONS_URL = "http://notifications-api-development.azurewebsites.net/api"
-API_URL = "http://syncer-api-development.azurewebsites.net/api"
+NOTIFICATIONS_URL = "http://unhost/notifications/api"
+API_URL = "http://unhost/api"
 JOB_ID = 1
 
 process.env.MAX_DEQUEUE_COUNT = 5
-process.env.NOTIFICATIONS_API_URL = NOTIFICATIONS_URL
-process.env.API_URL = API_URL
 
 _ = require "lodash"
 nock = require "nock"
 should = require "should"
-JobsProcessor = require "./index"
-
-OptionsGenerator = ({ message: { resource, method, body, headers } }) ->
-  {
-    url: "#{API_URL}#{resource}"
-    method
-    headers
-    json: body
-  }
+JobProcessor = require "./index"
 
 mockFailedNotificationWith = (badStatusCode) ->
   errorMessage = "it's a trap!"
@@ -35,7 +25,7 @@ _notificationsApiNock = (bodyExpected) ->
     .post "/jobs/#{JOB_ID}/operations", (body) -> _.omit(body, "request").should.be.eql bodyExpected
     .reply 200
 
-describe "JobsProcessor: ", ->
+describe "JobProcessor", ->
 
   afterEach ->
     nock.cleanAll()
@@ -47,7 +37,7 @@ describe "JobsProcessor: ", ->
 
     it "and dequeue counter is greater than MAX_DEQUEUE_COUNT, should notify for fail to notificationsApi", ->
       mockFailedNotificationWith 500
-      _processJob(dequeueCount: 6)
+      _processJob { dequeueCount: 6 }
       .tap -> nock.isDone().should.be.ok()
 
     it "equal to 400 then is success but should notify for fail to notificationsApi", ->
@@ -84,10 +74,8 @@ message =
 _createJobNotification = (meta) -> { message, meta }
 
 _processJob = (meta = { dequeueCount: 1 }) ->
-  processor = JobsProcessor { buildOpts: OptionsGenerator }
-  job = _createJobNotification meta
-
-  processor job
+  processor = JobProcessor { apiUrl: API_URL, notificationApiUrl: NOTIFICATIONS_URL }
+  processor _createJobNotification meta
 
 _nockAPI = (statusCode = 200, errorMessage = "") ->
   nock API_URL

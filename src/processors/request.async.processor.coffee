@@ -7,7 +7,7 @@ _normalizeHeaders = (headers) ->
     .fromPairs()
     .value()
 
-builderRequest = (apiUrl) -> ({ message }) ->
+builderRequest = (apiUrl, fullResponse) -> ({ message }) ->
   { Resource, Method, Body, HeadersForRequest } = message
   json = if Body?.length > 0 then JSON.parse(Body) else true
 
@@ -16,7 +16,8 @@ builderRequest = (apiUrl) -> ({ message }) ->
     method: Method
     headers: _normalizeHeaders HeadersForRequest
     json: json
+    resolveWithFullResponse: fullResponse
   }
 
-module.exports = ({ apiUrl, silentErrors }) ->
-  RequestProcessor builderRequest(apiUrl), silentErrors
+module.exports = ({ apiUrl, fullResponse = false }) ->
+  RequestProcessor builderRequest(apiUrl, fullResponse)
