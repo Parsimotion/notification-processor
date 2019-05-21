@@ -2,6 +2,16 @@
 
 [![NPM version](https://badge.fury.io/js/notification-processor.png)](http://badge.fury.io/js/notification-processor)
 
+# New Features
+* Adding request async processor
+
+```Javascript
+require("notification-processor").RequestAsyncProcessor({
+    apiUrl: "baseAPI..."
+    silentErrors: []
+})
+```
+
 # Migrating 1.x -> 2.x
 
 ## Deadletter Processor
