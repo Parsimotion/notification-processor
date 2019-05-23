@@ -8,7 +8,7 @@ module.exports =
 
     constructor: (args) ->
       super args
-      @nonRetryable = args.nonRetryable
+      { @notificationApiUrl, @nonRetryable } = args
 
     process: (notification) ->
       super(notification).thenReturn()
@@ -30,5 +30,9 @@ module.exports =
         request: _.omit error.detail.request, ["resolveWithFullResponse"]
       }
 
-    _notificationsApi: ({ headers }) =>
-      new NotificationsApi headers["Authorization"]
+    _notificationsApi: ({ HeadersForRequest, JobId }) =>
+      new NotificationsApi {
+        token: _.find(HeadersForRequest, { Key: "Authorization" }).Value
+        jobId: JobId
+        @notificationApiUrl
+      }

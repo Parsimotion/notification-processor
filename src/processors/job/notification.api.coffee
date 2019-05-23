@@ -1,23 +1,21 @@
-NOTIFICATIONS_URL = process.env.NOTIFICATIONS_API_URL
-
 _ = require "lodash"
 request = require("request-promise")
 retry = require("bluebird-retry")
 
 class NotificationsApi
-  constructor: (@token) ->
+  constructor: ({ @notificationApiUrl, @token, @jobId }) ->
 
-  success: ({ message: { jobId }, statusCode }) => retry(( =>
-     @_makeRequest jobId, { statusCode, success: yes }
+  success: ({ statusCode }) => retry(( =>
+     @_makeRequest { statusCode, success: yes }
   ), { max_tries: 3 }).catchReturn()
 
-  fail: ({ message: { jobId }, statusCode, error, request }) => retry(( =>
-    @_makeRequest jobId, { statusCode, success: no, message: _.get(error, "message"), request }
+  fail: ({ statusCode, error, request }) => retry(( =>
+    @_makeRequest { statusCode, success: no, message: _.get(error, "message"), request }
   ), { max_tries: 3 }).catchReturn()
 
-  _makeRequest: (jobId, body) =>
+  _makeRequest: (body) =>
     request {
-      url: "#{NOTIFICATIONS_URL}/jobs/#{jobId}/operations"
+      url: "#{ @notificationApiUrl }/jobs/#{ @jobId }/operations"
       method: "POST"
       headers: { authorization: @token }
       json: body

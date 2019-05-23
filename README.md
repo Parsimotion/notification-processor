@@ -2,6 +2,21 @@
 
 [![NPM version](https://badge.fury.io/js/notification-processor.png)](http://badge.fury.io/js/notification-processor)
 
+# Breaking change
+* Configure API URL and Notification API URL at job processor
+```Javascript
+//2.x
+require("notification-processor").JobProcessor({
+    buildOpts: (message) => ({}), notificationApiUrl: "apiNotificationUrl"
+})
+
+//3.x
+require("notification-processor").JobProcessor({
+    apiUrl: "",
+    notificationApiUrl: ""
+})
+```
+
 # New Features
 * Adding request async processor
 
