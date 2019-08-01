@@ -10,7 +10,7 @@ module.exports =
         throw @_sanitizeError_ err if @_shouldRetry_ notification, err
         @_onMaxRetryExceeded_ notification, err
 
-    _shouldRetry_: ({ meta: { dequeueCount } }, err) ->
+    _shouldRetry_: ({ meta: { dequeueCount = 0 } }, err) ->
       dequeueCount < @maxRetries
 
     _onSuccess_: (notification, result) -> throw new Error "subclass responsability"
