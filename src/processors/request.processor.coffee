@@ -3,12 +3,18 @@ Promise = require "bluebird";
 request = require "request-promise"
 { StatusCodeError, RequestError } = require "request-promise/errors"
 httpStatus = require("http").STATUS_CODES
-MESSAGE_PROPERTIES = ["reason", "error", "message"]
-
-_retrieveMessage = (message) ->
-  if _.isString(message) then message else null
+MESSAGE_PROPERTIES = ["reason", "error.error", "error.code", "code", "error"]
 
 _safeParse = (raw) ->  if _.isObject(raw) then raw else try JSON.parse raw
+
+_type = (statusCode, error) ->
+  _ MESSAGE_PROPERTIES
+    .map (key) -> _.get error, key
+    .concat [ httpStatus[statusCode] ]
+    .filter _.isString
+    .compact()
+    .head()
+
 
 module.exports = (requestGenerator, { silentErrors = [] } = {}) -> (notification) ->
   __isSilentError = (err) ->
@@ -20,11 +26,17 @@ module.exports = (requestGenerator, { silentErrors = [] } = {}) -> (notification
     .promise()
     .catch __isSilentError, (err) -> _.omit err, "response"
     .catch StatusCodeError, ({ statusCode, error }) ->
-      throw
-        message: _(_safeParse error).pick(MESSAGE_PROPERTIES).values().concat(httpStatus[statusCode]).map(_retrieveMessage).compact().head()
-        detail: response: { statusCode, body: error }
+      safeError = _safeParse error
+      type = _type statusCode, safeError
+
+      throw {
+        type
+        message: _.get(safeError, "error.message") or _.get(safeError, "message") or type
+        detail: { response: { statusCode, body: safeError } }
+      }
     .catch RequestError, ({ cause }) ->
-      throw
-        message: cause.code
+      throw {
+        type: cause.code
         detail: cause
-    .tapCatch (err) -> _.defaultsDeep err, { message: "unknown", detail: request: options }
+      }
+    .tapCatch (err) -> _.defaultsDeep err, { type: "unknown", message: "unknown", detail: { request: options } }

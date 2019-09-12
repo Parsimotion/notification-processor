@@ -10,7 +10,8 @@ class NotificationsApi
   ), { max_tries: 3 }).catchReturn()
 
   fail: ({ statusCode, error, request }) => retry(( =>
-    @_makeRequest { statusCode, success: no, message: _.get(error, "message"), request }
+    message = _.get error, "message"
+    @_makeRequest { statusCode, success: no, message, request }
   ), { max_tries: 3 }).catchReturn()
 
   _makeRequest: (body) =>
