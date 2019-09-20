@@ -1,4 +1,5 @@
 _ = require "lodash"
+NonRetryableError = require "../exceptions/non.retryable"
 Promise = require "bluebird";
 request = require "request-promise"
 { StatusCodeError, RequestError } = require "request-promise/errors"
@@ -15,16 +16,16 @@ _type = (statusCode, error) ->
     .compact()
     .head()
 
-
-module.exports = (requestGenerator, { silentErrors = [] } = {}) -> (notification) ->
-  __isSilentError = (err) ->
-    err.constructor is StatusCodeError and _.includes silentErrors, err.statusCode
+module.exports = (requestGenerator, { silentErrors = [], nonRetryable = [] } = {}) -> (notification) ->
+  __isIncludedInStatusesError = (statuses) -> (err) ->
+    err.constructor is StatusCodeError and _.includes statuses, err.statusCode
 
   Promise.method(requestGenerator) notification
   .then (options) -> 
     request options
     .promise()
-    .catch __isSilentError, (err) -> _.omit err, "response"
+    .catch __isIncludedInStatusesError(silentErrors), (err) -> _.omit err, "response"
+    .catch __isIncludedInStatusesError(nonRetryable), (err) -> throw new NonRetryableError _.omit(err, "response")
     .catch StatusCodeError, ({ statusCode, error }) ->
       safeError = _safeParse error
       type = _type statusCode, safeError

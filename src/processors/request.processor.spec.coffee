@@ -6,6 +6,7 @@ errors = require "request-promise/errors";
 Promise = require "bluebird"
 
 RequestProcessor = require "./request.processor"
+NonRetryableError = require "../exceptions/non.retryable"
 
 DOMAIN = "http://miApi.com.foo"
 PATH = "/api/availableQuantity/123"
@@ -47,6 +48,15 @@ describe "RequestProcessor", ->
 
     spy MESSAGE
     .should.be.fulfilled()
+    .tap -> nockDomain.done()
+    .tap -> spy.should.be.calledWith MESSAGE
+
+  it "should do a POST request and its should be ignored if is a silent errors", ->
+    nockDomain = nockStub().reply 400, {}
+    spy = sinon.spy RequestProcessor req, { nonRetryable: [ 400 ] }
+
+    spy MESSAGE
+    .should.be.rejectedWith NonRetryableError
     .tap -> nockDomain.done()
     .tap -> spy.should.be.calledWith MESSAGE
 
