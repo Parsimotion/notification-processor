@@ -1,4 +1,5 @@
 _ = require "lodash"
+NonRetryable = require "./exceptions/non.retryable"
 EventEmitter = require "events"
 Promise = require "bluebird"
 uuid = require "uuid/v4"
@@ -20,6 +21,7 @@ module.exports =
 
       $promise
       .tap => @_emitEvent "successful", { context, id, notification }
+      .catch NonRetryable, (error) => @_emitEvent "unsuccessful_non_retriable", { context, id, notification, error }
       .tapCatch (error) => @_emitEvent "unsuccessful", { context, id, notification, error }
       .finally => @_emitEvent "finished", { context, id, notification }
       .asCallback context.done
