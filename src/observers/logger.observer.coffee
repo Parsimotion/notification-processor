@@ -6,13 +6,13 @@ module.exports =
       log.info "A new message has been received", { id, notification: JSON.stringify(notification) }
 
     observable.on "successful", ({ context: { log }, id }) ->
-      log.info "Process successful", { id }
+      log.info "The process was successful", { id }
 
     observable.on "unsuccessful", ({ context: { log }, id, notification, error }) ->
-      log.error "Process unsuccessful", { id, notification: JSON.stringify(notification), error: JSON.stringify(errorToJson(error)) }
+      log.error "The process was unsuccessful", { id, notification: JSON.stringify(notification), error: JSON.stringify(errorToJson(error)) }
 
     observable.on "unsuccessful_non_retriable", ({ context: { log }, id, notification, error }) ->
-      log.error "Process unsuccessful but it can't retry", { id, notification: JSON.stringify(notification), error: JSON.stringify(errorToJson(error)) }
+      log.error "The process was unsuccessful but it can't be retried", { id, notification: JSON.stringify(notification), error: JSON.stringify(errorToJson(error)) }
 
     observable.on "ignored", ({ context: { log }, id }) ->
-      log.verbose "Message ignored", { id }
+      log.verbose "The message was ignored", { id }
