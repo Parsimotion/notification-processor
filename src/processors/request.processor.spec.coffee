@@ -6,7 +6,7 @@ errors = require "request-promise/errors";
 Promise = require "bluebird"
 
 RequestProcessor = require "./request.processor"
-NonRetryableError = require "../exceptions/non.retryable"
+NonRetryable = require "../exceptions/non.retryable"
 
 DOMAIN = "http://miApi.com.foo"
 PATH = "/api/availableQuantity/123"
@@ -56,7 +56,7 @@ describe "RequestProcessor", ->
     spy = sinon.spy RequestProcessor req, { nonRetryable: [ 400 ] }
 
     spy MESSAGE
-    .should.be.rejectedWith NonRetryableError
+    .should.be.rejectedWith NonRetryable
     .tap -> nockDomain.done()
     .tap -> spy.should.be.calledWith MESSAGE
 

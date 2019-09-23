@@ -1,9 +1,9 @@
 module.exports =
-class NonRetryable
-  constructor: (message) ->
-    @name = @constructor.name
-    @message = message
-    @stack = (new Error).stack
+  class NonRetryable
+    constructor: (message, @cause) ->
+      @name = @constructor.name
+      @message = message
+      @stack = (new Error).stack
 
-  @:: = new Error
-  @::constructor = @
+    @:: = new Error
+    @::constructor = @

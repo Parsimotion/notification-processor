@@ -18,14 +18,17 @@ _type = (statusCode, error) ->
 
 module.exports = (requestGenerator, { silentErrors = [], nonRetryable = [] } = {}) -> (notification) ->
   __isIncludedInStatusesError = (statuses) -> (err) ->
-    err.constructor is StatusCodeError and _.includes statuses, err.statusCode
+    _.includes statuses, _.get(err, "detail.response.statusCode")
 
   Promise.method(requestGenerator) notification
   .then (options) -> 
     request options
     .promise()
-    .catch __isIncludedInStatusesError(silentErrors), (err) -> _.omit err, "response"
-    .catch __isIncludedInStatusesError(nonRetryable), (err) -> throw new NonRetryableError _.omit(err, "response")
+    .catch RequestError, ({ cause }) ->
+      throw {
+        type: cause.code
+        detail: cause
+      }
     .catch StatusCodeError, ({ statusCode, error }) ->
       safeError = _safeParse error
       type = _type statusCode, safeError
@@ -35,9 +38,6 @@ module.exports = (requestGenerator, { silentErrors = [], nonRetryable = [] } = {
         message: _.get(safeError, "error.message") or _.get(safeError, "message") or type
         detail: { response: { statusCode, body: safeError } }
       }
-    .catch RequestError, ({ cause }) ->
-      throw {
-        type: cause.code
-        detail: cause
-      }
     .tapCatch (err) -> _.defaultsDeep err, { type: "unknown", message: "unknown", detail: { request: options } }
+    .catch __isIncludedInStatusesError(silentErrors), (err) -> err
+    .catch __isIncludedInStatusesError(nonRetryable), (err) -> throw new NonRetryableError "An error has ocurred in that request", _.omit(err, "response")
