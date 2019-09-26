@@ -1,4 +1,5 @@
 _ = require "lodash"
+NonRetryableError = require "./exceptions/non.retryable"
 ProcessorBuilder = require "./processor.builder"
 should = require "should"
 Promise = require "bluebird"
@@ -37,6 +38,9 @@ describe "Promise - Processor", ->
 
     it "Returns a unsuccessful promise", (done) ->
       doWith statusAsync(false, done), -> Promise.reject new Error
+
+    it "Returns a successful promise if non retriable error", (done) ->
+      doWith statusAsync(true, done), -> Promise.reject new NonRetryableError
 
   describe "using timeout", ->
 
