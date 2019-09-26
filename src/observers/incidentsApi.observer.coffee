@@ -10,7 +10,7 @@ module.exports =
       @messageSender = @_buildMessageSender connectionString, topic
   
     listenTo: (observable) ->
-      observable.on "unsuccessful_non_retriable", @publishToTopic
+      observable.on "unsuccessful_non_retryable", @publishToTopic
 
     publishToTopic: ({ id, notification, error }) =>
       message = { body: JSON.stringify @_mapper(id, notification, error.cause) }

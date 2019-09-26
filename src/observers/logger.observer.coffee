@@ -11,7 +11,7 @@ module.exports =
     observable.on "unsuccessful", ({ context: { log }, id, notification, error }) ->
       log.error "The process was unsuccessful", { id, notification: JSON.stringify(notification), error: JSON.stringify(errorToJson(error)) }
 
-    observable.on "unsuccessful_non_retriable", ({ context: { log }, id, notification, error }) ->
+    observable.on "unsuccessful_non_retryable", ({ context: { log }, id, notification, error }) ->
       log.error "The process was unsuccessful but it can't be retried", { id, notification: JSON.stringify(notification), error: JSON.stringify(errorToJson(error)) }
 
     observable.on "ignored", ({ context: { log }, id }) ->

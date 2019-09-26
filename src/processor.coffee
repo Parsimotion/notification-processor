@@ -21,7 +21,7 @@ module.exports =
 
       $promise
       .tap => @_emitEvent "successful", { context, id, notification }
-      .catch NonRetryable, (error) => @_emitEvent "unsuccessful_non_retriable", { context, id, notification, error }
+      .catch NonRetryable, (error) => @_emitEvent "unsuccessful_non_retryable", { context, id, notification, error }
       .tapCatch (error) => @_emitEvent "unsuccessful", { context, id, notification, error }
       .finally => @_emitEvent "finished", { context, id, notification }
       .asCallback context.done
