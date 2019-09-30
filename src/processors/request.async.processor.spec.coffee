@@ -51,3 +51,10 @@ describe "RequestAsyncProcessor", ->
     .should.be.rejected()
     .tap -> nockDomain.done()
 
+  it "should do a POST request to the specified url via Domain header", ->
+    domain = "http://anita.huer.fanita"
+    nockDomain = nock(domain).post(PATH).reply 200, {}
+
+    processor _.merge {}, MESSAGE, message: { HeadersForRequest: [ Key: "Domain", Value: domain ] }
+    .should.be.fulfilled()
+    .tap -> nockDomain.done()
