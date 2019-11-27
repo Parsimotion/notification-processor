@@ -10,12 +10,12 @@ _normalizeHeaders = (headers) ->
     
 module.exports = ({ apiUrl, notificationApiUrl, maxRetries, nonRetryable = [400] }) ->
   (it) -> 
-  { HeadersForRequest } = it.message
-  headers = _normalizeHeaders HeadersForRequest
-  new JobProcessor {
-    processor: RequestProcessor { apiUrl: headers.Domain || apiUrl, fullResponse: true }
-    maxRetries
-    nonRetryable
-    notificationApiUrl
-  }
-  .process it
+    { HeadersForRequest } = it.message
+    headers = _normalizeHeaders HeadersForRequest
+    new JobProcessor {
+      processor: RequestProcessor { apiUrl: headers.Domain || apiUrl, fullResponse: true }
+      maxRetries
+      nonRetryable
+      notificationApiUrl
+    }
+    .process it
