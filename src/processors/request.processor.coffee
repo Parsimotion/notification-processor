@@ -11,7 +11,7 @@ _safeParse = (raw) ->  if _.isObject(raw) then raw else try JSON.parse raw
 _type = (statusCode, error) ->
   _ MESSAGE_PROPERTIES
     .map (key) -> _.get error, key
-    .concat [ httpStatus[statusCode] ]
+    .concat [ _.toLower(httpStatus[statusCode]) ]
     .filter _.isString
     .compact()
     .head()
