@@ -11,7 +11,7 @@ module.exports =
 
     constructor: ({ @source, @runner, @timeout }) -> super()
 
-    process: (context, raw) =>
+    process: (raw, context) =>
       id = uuid()
       notification = @source.newNotification { context, id, message: raw }
 
