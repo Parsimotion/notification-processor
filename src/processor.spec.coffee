@@ -19,7 +19,7 @@ createProcessor = (fn) ->
 
 doWith = (verifier, fn) ->
   createProcessor fn
-  .process azureContext(verifier), {}
+  .process {}, azureContext(verifier)
 
 describe "Promise - Processor", ->
 
@@ -51,8 +51,8 @@ describe "Promise - Processor", ->
 
     it "should success if processor is resolved before timeout", (done) ->
       processor.timeout = 50
-      processor.process azureContext(statusAsync(true, done)), {}
+      processor.process {}, azureContext(statusAsync(true, done))
 
     it "should fail if processor is resolved after timeout", (done) ->
       processor.timeout = 10
-      processor.process azureContext(statusAsync(false, done)), {}
+      processor.process {}, azureContext(statusAsync(false, done))
