@@ -37,6 +37,7 @@ module.exports = (requestGenerator, { silentErrors = [], nonRetryable = [] } = {
         type
         message: _.get(safeError, "error.message") or _.get(safeError, "message") or type
         detail: { response: { statusCode, body: safeError } }
+        tags: safeError?.tags
       }
     .tapCatch (err) -> _.defaultsDeep err, { type: "unknown", message: "unknown", detail: { request: options } }
     .catch __isIncludedInStatusesError(silentErrors), (err) -> err
