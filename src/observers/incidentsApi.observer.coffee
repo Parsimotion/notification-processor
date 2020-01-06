@@ -30,7 +30,8 @@ module.exports =
         @clientId
         error: _.omit err, "detail.request"
         request: _.omit _.get(err, "detail.request"), @propertiesToOmit
-        type: _.get(err, "type") || "unknown_error"
+        type: _.get err, "type", "unknown_error"
+        tags: _.get err, "tags", []
       }
     
     _buildMessageSender: (connectionString, topic) ->
