@@ -60,6 +60,15 @@ describe "RequestProcessor", ->
     .tap -> nockDomain.done()
     .tap -> spy.should.be.calledWith MESSAGE
 
+  it "should do a POST request and its should be ignored if is a silent errors", ->
+    nockDomain = nockStub().reply 400, {}
+    spy = sinon.spy RequestProcessor req, { nonRetryable: ['client'] }
+
+    spy MESSAGE
+    .should.be.rejectedWith NonRetryable
+    .tap -> nockDomain.done()
+    .tap -> spy.should.be.calledWith MESSAGE
+
   it "should do a POST request event if is called with a promise and it should be successful", ->
     nockDomain = nockStub().reply 200, {}
     spy = sinon.spy => Promise.resolve req()

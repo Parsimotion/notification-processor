@@ -16,10 +16,17 @@ _type = (statusCode, error) ->
     .compact()
     .head()
 
-module.exports = (requestGenerator, { silentErrors = [], nonRetryable = [] } = {}) -> (notification) ->
-  __isIncludedInStatusesError = (statuses) -> (err) ->
-    _.includes statuses, _.get(err, "detail.response.statusCode")
+errorConditions =
+  client: (it) -> it >= 400 and it < 500
+  server: (it) -> it >= 500
 
+__isIncludedInStatusesError = (conditions) -> (err) ->
+  statusCode = _.get err, "detail.response.statusCode"
+  _(conditions)
+  .map (it) -> _.get(errorConditions, it, _.partial(_.isEqual, it)) 
+  .some (condition) -> condition statusCode
+
+module.exports = (requestGenerator, { silentErrors = [], nonRetryable = [] } = {}) -> (notification) ->
   Promise.method(requestGenerator) notification
   .then (options) -> 
     request options
