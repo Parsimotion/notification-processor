@@ -11,5 +11,7 @@ module.exports =
     RequestAsyncProcessor: require "./processors/request.async.processor"
     JobProcessor: require "./processors/job"
     MaxRetriesProcessor: require "./processors/maxRetries.processor"
+  Exceptions:
+    NonRetryable: require "./exceptions/non.retryable"
   Sources: require "./sources"
   Senders: require "./senders"
