@@ -8,7 +8,7 @@ module.exports =
   Processors:
     DeadLetterProcessor: require "./processors/deadletter.processor"
     RequestProcessor: require "./processors/request.processor"
-    RequestAsyncProcessor: require "./processors/request.async.processor"
+    RequestAsyncProcessor: require "./processors/requestWithRetries.async.processor"
     JobProcessor: require "./processors/job"
     MaxRetriesProcessor: require "./processors/maxRetries.processor"
   Exceptions:
