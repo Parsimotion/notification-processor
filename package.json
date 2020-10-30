@@ -42,6 +42,9 @@
     "should-sinon": "0.0.5",
     "sinon": "^2.1.0"
   },
+  "peerDependencies:": {
+    "newrelic": "6.x"
+  },
   "engines": {
     "node": ">=6.x"
   },
