@@ -9,7 +9,7 @@ ENABLE_EVENTS = process.env.ENABLE_EVENTS isnt "false"
 module.exports =
   class Processor extends EventEmitter
 
-    constructor: ({ @source, @runner, @timeout }) -> super()
+    constructor: ({ @source, @runner, @timeout, @apm }) -> super()
 
     process: (context, raw) =>
       id = uuid()
