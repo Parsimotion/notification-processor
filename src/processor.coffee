@@ -20,22 +20,24 @@ module.exports =
       $promise = Promise.method(@runner) notification, context
       $promise = $promise.timeout(@timeout, "processor timeout") if @timeout?
 
-      promise = () -> $promise
-      .tap => @_emitEvent "successful", { context, id, notification }
-      .catch (error) =>
-        throw error unless error instanceof NonRetryable
-        @_emitEvent "unsuccessful_non_retryable", { context, id, notification, error }
-      .tapCatch (error) => @_emitEvent "unsuccessful", { context, id, notification, error }
-      .finally => @_emitEvent "finished", { context, id, notification }
-      .asCallback context.done
+      promise = () =>
+        if !@apm.active
+          $promise
+        else
+          console.log("EEEEEEEOU")
+          transactionName = "test-transact" #_.compact([@config.topic, @_subscriptionName(), folderScript()]).join "-"
+          newrelic().startBackgroundTransaction transactionName, "test-notif-processor", () ->
+            $promise
+            .tapCatch (err) -> console.log("FFFFAAAA", err) or newrelic().noticeError err
 
-      return promise() unless @apm.active
-
-      transactionName = "test-transact" #_.compact([@config.topic, @_subscriptionName(), folderScript()]).join "-"
-      newrelic().startBackgroundTransaction transactionName, "test", () ->
-        promise()
-        .tapCatch (err) -> newrelic().noticeError err
-
+      promise()
+        .tap => @_emitEvent "successful", { context, id, notification }
+        .catch (error) =>
+          throw error unless error instanceof NonRetryable
+          @_emitEvent "unsuccessful_non_retryable", { context, id, notification, error }
+        .tapCatch (error) => @_emitEvent "unsuccessful", { context, id, notification, error }
+        .finally => @_emitEvent "finished", { context, id, notification }
+        .asCallback context.done
       
 
     _emitEvent: (eventName, value) =>
