@@ -20,17 +20,15 @@ module.exports =
       $promise = Promise.method(@runner) notification, context
       $promise = $promise.timeout(@timeout, "processor timeout") if @timeout?
 
-      promise = () =>
+      execute = () =>
         if !@apm.active
           $promise
         else
-          console.log("EEEEEEEOU")
-          transactionName = "test-transact" #_.compact([@config.topic, @_subscriptionName(), folderScript()]).join "-"
-          newrelic().startBackgroundTransaction transactionName, "test-notif-processor", () ->
+          newrelic().startBackgroundTransaction @apm.transactionName, @apm.group, () -> 
             $promise
             .tapCatch (err) -> console.log("FFFFAAAA", err) or newrelic().noticeError err
 
-      promise()
+      execute()
         .tap => @_emitEvent "successful", { context, id, notification }
         .catch (error) =>
           throw error unless error instanceof NonRetryable
