@@ -7,7 +7,6 @@ logger = require "./observers/logger.observer"
 class ProcessorBuilder
 
   constructor: ->
-    console.log "FFF"
     @source = UnknownSource
     @listeners = []
 

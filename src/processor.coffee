@@ -21,7 +21,7 @@ module.exports =
       $promise = $promise.timeout(@timeout, "processor timeout") if @timeout?
 
       execute = () =>
-        if !@apm.active
+        if !@apm?.active
           $promise
         else
           newrelic().startBackgroundTransaction @apm.transactionName, @apm.group, () -> 
