@@ -25,7 +25,7 @@ module.exports =
       
         newrelic().startBackgroundTransaction @apm.transactionName, @apm.group, () -> 
           $promise
-          .tapCatch (err) -> newrelic().noticeError new Error("#{err.type} - #{JSON.stringify(err.detail)}")
+          .tapCatch (err) -> newrelic().noticeError new Error(JSON.stringify(_.omit(err.detail, "request.auth.pass")))
 
       execute()
       .tap => @_emitEvent "successful", { context, id, notification }
