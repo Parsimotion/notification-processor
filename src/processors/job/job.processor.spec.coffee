@@ -13,7 +13,7 @@ mockFailedNotificationWith = (badStatusCode) ->
   errorMessage = "it's a trap!"
   bodyExpected =
     statusCode: badStatusCode
-    message: errorMessage
+    #message: errorMessage
     success: no
 
   _nockAPI badStatusCode, errorMessage
