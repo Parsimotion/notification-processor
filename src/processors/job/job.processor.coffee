@@ -1,7 +1,8 @@
-NotificationsApi = require("./notification.api")
-MaxRetriesProcessor = require("../maxRetries.processor")
-request = require("request-promise")
 _ = require("lodash")
+request = require("request-promise")
+MaxRetriesProcessor = require("../maxRetries.processor")
+NonRetryable = require("../../exceptions/non.retryable")
+NotificationsApi = require("./notification.api")
 
 module.exports =
   class JobProcessor extends MaxRetriesProcessor
