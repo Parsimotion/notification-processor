@@ -23,12 +23,15 @@ module.exports =
       _.pick err, ["statusCode", "error"]
 
     _onMaxRetryExceeded_: ({ message }, error) =>
-      @_notificationsApi(message).fail {
+      errorMessage = {
         message
         statusCode: error.detail.response.statusCode
         error
         request: _.omit error.detail.request, ["resolveWithFullResponse"]
       }
+
+      @_notificationsApi(message).fail errorMessage
+        .throw new NonRetryable "Max retry exceeded", err
 
     _notificationsApi: ({ HeadersForRequest, JobId }) =>
       new NotificationsApi {
