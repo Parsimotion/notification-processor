@@ -32,7 +32,7 @@ module.exports =
       }
 
       @_notificationsApi(message).fail errorMessage
-        .throw new NonRetryable "Max retry exceeded", err
+        .throw new NonRetryable "Max retry exceeded", error
 
     _notificationsApi: ({ HeadersForRequest, JobId }) =>
       new NotificationsApi {
