@@ -14,10 +14,10 @@ module.exports =
       observable.on "unsuccessful_non_retryable", @publishToTopic
 
     publishToTopic: ({ id, notification, error }) =>
-      $message = Promise.props { body: JSON.stringify @_mapper(id, notification, error.cause) }
+      $message = Promise.props { body: @_mapper(id, notification, error.cause) }
       $message
       .tap (message) => debug "To publish message %o", message
-      .then (message) => @messageSender.send message
+      .then (message) => @messageSender.send JSON.stringify message
 
     _mapper: (id, notification, err) ->
 
