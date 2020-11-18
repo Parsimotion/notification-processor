@@ -1,4 +1,5 @@
 _ = require "lodash"
+Promise = require "bluebird"
 RedisObserver = require "./redis.observer"
 errorToJson = require "error-to-json"
 
@@ -18,7 +19,10 @@ module.exports =
       else Promise.resolve()
 
     _messagePath_: (notification) =>
-      "#{@app}/#{@sender.user(notification)}/#{@path}/#{@sender.resource(notification)}"
+      Promise.props
+        user: @sender.user notification
+        resource: @sender.resource notification
+      .then ({ user, resource }) => "#{@app}/#{user}/#{@path}/#{resource}"
 
     _channelPrefix_: (type) => "health-message-#{type}"
     _buildValue_: JSON.stringify

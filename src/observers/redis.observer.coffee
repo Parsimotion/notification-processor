@@ -15,10 +15,16 @@ module.exports =
       @redis.auth redis.auth if redis.auth
 
     publish: (notification, value) =>
-      @redis.publishAsync @_getChannel(notification), @_buildValue_(value)
+      Promise.props
+        channel: @_getChannel(notification)
+        value: @_buildValue_(value)
+      .then ({ channel, value }) => @redis.publishAsync channel, value
 
     _getChannel: (notification) =>
-      "#{@_channelPrefix_(notification.type)}/#{@_messagePath_ notification}"
+      Promise.props
+        channelPrefix: @_channelPrefix_ notification.type
+        messagePath: @_messagePath_ notification
+      .then ({ channelPrefix, messagePath }) => "#{channelPrefix}/#{messagePath}"
 
     _messagePath_: => throw new Error "not supported `_messagePath_`"
     _buildValue_: => throw new Error "not supported `_buildValue_`"
