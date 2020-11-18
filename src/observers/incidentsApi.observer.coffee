@@ -25,7 +25,7 @@ module.exports =
 
       Promise.props
         resource: @sender.resourceAsync notification
-        user: @sender.user notification
+        user: @sender.userAsync notification
       .then ({ resource, user }) => {
         id: encode [@app, @job, resource].join("_")
         @app
