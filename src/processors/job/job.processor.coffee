@@ -1,7 +1,8 @@
-NotificationsApi = require("./notification.api")
-MaxRetriesProcessor = require("../maxRetries.processor")
-request = require("request-promise")
 _ = require("lodash")
+request = require("request-promise")
+MaxRetriesProcessor = require("../maxRetries.processor")
+NonRetryable = require("../../exceptions/non.retryable")
+NotificationsApi = require("./notification.api")
 
 module.exports =
   class JobProcessor extends MaxRetriesProcessor
@@ -23,12 +24,15 @@ module.exports =
       _.pick err, ["statusCode", "error"]
 
     _onMaxRetryExceeded_: ({ message }, error) =>
-      @_notificationsApi(message).fail {
+      errorMessage = {
         message
         statusCode: error.detail.response.statusCode
         error
         request: _.omit error.detail.request, ["resolveWithFullResponse"]
       }
+
+      @_notificationsApi(message).fail errorMessage
+        .throw new NonRetryable "Max retry exceeded", error
 
     _notificationsApi: ({ HeadersForRequest, JobId }) =>
       new NotificationsApi {

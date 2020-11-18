@@ -1,3 +1,5 @@
+NonRetryable = require("../../exceptions/non.retryable")
+
 NOTIFICATIONS_URL = "http://unhost/notifications/api"
 API_URL = "http://unhost/api"
 JOB_ID = 1
@@ -39,12 +41,14 @@ describe "JobProcessor", ->
       mockFailedNotificationWith 500
       _processJob { dequeueCount: 6 }
       .tap -> nock.isDone().should.be.ok()
+      .should.be.rejectedWith NonRetryable
 
     it "equal to 400 then is success but should notify for fail to notificationsApi", ->
       mockFailedNotificationWith 400
 
       _processJob()
       .tap -> nock.isDone().should.be.ok()
+      .should.be.rejectedWith NonRetryable
 
   context "when API response with good status code", ->
     it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should notify for success to notificationsApi", ->
