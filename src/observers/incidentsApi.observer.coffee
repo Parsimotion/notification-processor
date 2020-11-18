@@ -23,24 +23,22 @@ module.exports =
 
       Promise.promisifyAll @sender
 
-      __stringifySenderResult = (asyncFn) =>
-        asyncFn notification
-          .then (result) => "#{ result }"
-
-      Promise.props      
-        {
-          id: encode [@app, @job, resource].join("_")
-          @app
-          @job
-          resource: __stringifySenderResult @sender.resourceAsync
-          notification: notification
-          user: __stringifySenderResult @sender.user
-          @clientId
-          error: _.omit err, "detail.request"
-          request: _.omit _.get(err, "detail.request"), @propertiesToOmit
-          type: _.get err, "type", "unknown_error"
-          tags: _.get err, "tags", []
-        }
+      Promise.props
+        resource: @sender.resourceAsync notification
+        user: @sender.user notification
+      .then ({ resource, user }) => {
+        id: encode [@app, @job, resource].join("_")
+        @app
+        @job
+        resource: "#{ resource }"
+        notification: notification
+        user: "#{ user }"
+        @clientId
+        error: _.omit err, "detail.request"
+        request: _.omit _.get(err, "detail.request"), @propertiesToOmit
+        type: _.get err, "type", "unknown_error"
+        tags: _.get err, "tags", []
+      }
     
     _buildMessageSender: (connectionString, topic) ->
       ServiceBusClient
