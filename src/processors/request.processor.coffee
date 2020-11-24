@@ -30,7 +30,7 @@ module.exports = (requestGenerator, { silentErrors = [], nonRetryable = [] } = {
       safeError = _safeParse error
 
       throw {
-        # message: _.get(safeError, "error.message") or _.get(safeError, "message") or type
+        message: _.get(safeError, "error.message") or _.get(safeError, "message")
         detail: { response: { statusCode, body: safeError } }
         tags: safeError?.tags
       }
