@@ -7,7 +7,7 @@ _companyId = (method, token) =>
   if (method != "Basic")
     return new OAuthApi(token).companyId()
   decoded = Buffer.from(token, "base64").toString();
-  Promise.resolve(_.split(decoded, ":")[0])
+  _.split(decoded, ":")[0]
 
 module.exports =
   user: ({ message: { HeadersForRequest } }) => 
@@ -23,6 +23,7 @@ module.exports =
       parsedBody = JSON.parse(Body)
     catch e 
       parsedBody = null
-    console.log("resource", parsedBody && parsedBody.channelProductId)
-    "test" #parsedBody && parsedBody.channelProductId
+    "test4"
+   # console.log("resource", parsedBody && parsedBody.channelProductId)
+   #parsedBody && parsedBody.channelProductId
   
