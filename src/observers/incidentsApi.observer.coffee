@@ -35,8 +35,8 @@ module.exports =
         type: _.get err, "type", "unknown_error"
         tags: _.get err, "tags", []
       }
-      .then (it) => JSON.stringify(it)
-    
+      .then JSON.stringify
+
     _buildMessageSender: (connectionString, topic) ->
       ServiceBusClient
       .createFromConnectionString(connectionString)
