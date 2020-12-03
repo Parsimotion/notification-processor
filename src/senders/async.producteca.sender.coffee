@@ -9,6 +9,8 @@ _companyId = (method, token) =>
   decoded = Buffer.from(token, "base64").toString();
   _.split(decoded, ":")[0]
 
+_resource = ({ Resource }) => _.reject(Resource, isNaN).join("")
+
 module.exports =
   user: ({ message: { HeadersForRequest } }) => 
     auth = _.find(HeadersForRequest, { Key: "Authorization" })
@@ -17,13 +19,6 @@ module.exports =
     _companyId(method, token)
     .tap (it) => console.log("USEER", it)
   ,
-  resource: ({ message: { Body } }) => 
-    parsedBody
-    try 
-      parsedBody = JSON.parse(Body)
-    catch e 
-      parsedBody = null
-    "test4"
-   # console.log("resource", parsedBody && parsedBody.channelProductId)
-   #parsedBody && parsedBody.channelProductId
+  resource: ({ message }, resourceGetter) => 
+    if _.isFunction(resourceGetter) then resourceGetter(message) else _resource(message)
   
