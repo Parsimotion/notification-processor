@@ -17,7 +17,6 @@ module.exports =
       $message
       .tap (message) => debug "To publish message %o", message
       .then (message) => @messageSender.send message
-      .tap () => console.log("DONE")
 
     _mapper: (id, notification, err) ->
       Promise.props
