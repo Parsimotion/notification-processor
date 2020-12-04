@@ -23,5 +23,5 @@ builderRequest = (apiUrl, fullResponse) -> ({ message }) ->
     resolveWithFullResponse: fullResponse
   }
 
-module.exports = ({ apiUrl, fullResponse = false }) ->
-  RequestProcessor builderRequest(apiUrl, fullResponse)
+module.exports = ({ apiUrl, fullResponse = false, silentErrors, nonRetryable }) ->
+  RequestProcessor builderRequest(apiUrl, fullResponse), { silentErrors, nonRetryable }

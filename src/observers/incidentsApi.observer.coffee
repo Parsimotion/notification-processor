@@ -9,7 +9,6 @@ module.exports =
 
     constructor: ({ @sender, @clientId, @app, @job, @propertiesToOmit = "auth", connection : { connectionString, topic } }) ->
       @messageSender = @_buildMessageSender connectionString, topic
-  
     listenTo: (observable) ->
       observable.on "unsuccessful_non_retryable", @publishToTopic
 
@@ -17,15 +16,12 @@ module.exports =
       $message = Promise.props { body: @_mapper(id, notification, error.cause) }
       $message
       .tap (message) => debug "To publish message %o", message
-      .then (message) => @messageSender.send JSON.stringify message
+      .then (message) => @messageSender.send message
 
     _mapper: (id, notification, err) ->
-
-      Promise.promisifyAll @sender
-
       Promise.props
-        resource: @sender.resourceAsync notification
-        user: @sender.userAsync notification
+        resource: Promise.method(@sender.resource) notification
+        user: Promise.method(@sender.user) notification
       .then ({ resource, user }) => {
         id: encode [@app, @job, resource].join("_")
         @app
@@ -39,7 +35,8 @@ module.exports =
         type: _.get err, "type", "unknown_error"
         tags: _.get err, "tags", []
       }
-    
+      .then JSON.stringify
+
     _buildMessageSender: (connectionString, topic) ->
       ServiceBusClient
       .createFromConnectionString(connectionString)
