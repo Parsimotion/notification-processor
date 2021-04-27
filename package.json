@@ -21,7 +21,7 @@
     "grunt": "^1.0.3",
     "lodash": "^4.17.10",
     "moment": "^2.18.1",
-    "redis": "^2.7.1",
+    "redis": "^3.1.1",
     "request": "^2.87.0",
     "request-promise": "^4.2.0",
     "url-safe-base64": "^1.1.0",
