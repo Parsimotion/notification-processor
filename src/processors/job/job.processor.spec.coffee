@@ -28,11 +28,13 @@ _notificationsApiNock = (bodyExpected) ->
     .reply 200
 
 _notificationsApiGetJob = (response) ->
-  nock NOTIFICATIONS_URL
-    .get "/jobs/#{JOB_ID}"
-    .reply 200, response or { stopped: false }
-
+  _.times 2, -> #Los tests no usan la cache para mantener la independencia. Es una request por el process y otra por el notify success/fail. 
+    nock NOTIFICATIONS_URL
+      .get "/jobs/#{JOB_ID}"
+      .reply 200, response or { stopped: false }
 describe "JobProcessor", ->
+  beforeEach ->
+    process.env.NODE_ENV = "test"
 
   afterEach ->
     nock.cleanAll()
@@ -56,19 +58,31 @@ describe "JobProcessor", ->
 
       _processJob()
       .tap -> nock.isDone().should.be.ok()
+      .tapCatch (a) => console.log('error del test que falla', a)
       .should.be.rejectedWith NonRetryable
 
   context "when API response with good status code", ->
     it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should notify for success to notificationsApi", ->
       _nockAPI()
       _notificationsApiGetJob()
-
       _notificationsApiNock = nock NOTIFICATIONS_URL
       .post "/jobs/#{JOB_ID}/operations"
       .reply 200
 
       _processJob()
       .tap -> _notificationsApiNock.done()
+  context "Stopped jobs", ->
+    it "If job is stopped, should not notify for success to notificationsApi", ->
+      _nockAPI()
+
+      _notificationsApiNock = nock NOTIFICATIONS_URL
+      .post "/jobs/#{JOB_ID}/operations"
+      .reply 200
+
+      _notificationsApiGetJob(stopped: true)
+
+      _processJob()
+      .tap -> _notificationsApiNock.isDone().should.be.false()
 
 message =
   "Method":"POST"

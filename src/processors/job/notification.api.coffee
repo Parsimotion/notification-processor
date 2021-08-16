@@ -26,9 +26,9 @@ class NotificationsApi
   
   jobIsStopped: () => 
     cachedStoppedJob = stoppedJobsCache.get @jobId
-    return Promise.resolve cachedStoppedJob if cachedStoppedJob?
+    return Promise.resolve cachedStoppedJob if process.env.NODE_ENV isnt "test" and cachedStoppedJob? 
     @_jobIsStopped()
-    .tap (jobIsStopped) => stoppedJobsCache.set(@jobId, job) if jobIsStopped
+    .tap (jobIsStopped) => stoppedJobsCache.set(@jobId, jobIsStopped) if jobIsStopped
   
   _jobIsStopped: () => 
     @_fetchJob()
@@ -36,7 +36,7 @@ class NotificationsApi
 
   _fetchJob: () => 
     cachedJob = jobsCache.get @jobId
-    return Promise.resolve cachedJob if cachedJob?
+    return Promise.resolve cachedJob if process.env.NODE_ENV isnt "test" and cachedJob?
     @_doFetchJob()
     .tap (job) => jobsCache.set @jobId, job
 
@@ -45,6 +45,7 @@ class NotificationsApi
       url: "#{ @notificationApiUrl }/jobs/#{ @jobId }"
       method: "GET"
       headers: { authorization: @token }
+      json: true
     }).promise()
 
     retry __fetchJob, throw_original: true

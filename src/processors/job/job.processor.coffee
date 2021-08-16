@@ -3,6 +3,7 @@ request = require("request-promise")
 MaxRetriesProcessor = require("../maxRetries.processor")
 NonRetryable = require("../../exceptions/non.retryable")
 NotificationsApi = require("./notification.api")
+debug = require("debug") "notification-processor:job-processor"
 
 module.exports =
   class JobProcessor extends MaxRetriesProcessor
@@ -44,5 +45,7 @@ module.exports =
     _ifJobIsNotStopped: (message, action) =>
       @_notificationsApi(message).jobIsStopped()
       .then (jobIsStopped) =>
-        return Promise.resolve() if jobIsStopped
+        if jobIsStopped
+          console.log "job #{message.JobId} is stopped, ignoring action"
+          return Promise.resolve() 
         action()
