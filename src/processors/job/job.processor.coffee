@@ -11,11 +11,11 @@ module.exports =
       super args
       { @notificationApiUrl, @nonRetryable } = args
 
-    process: (notification) ->
-      super(notification).thenReturn()
+    process: (notification) =>
+      @_ifJobIsNotStopped notification.message, () => super(notification).thenReturn()
 
     _onSuccess_: ({ message }, { statusCode }) =>
-      @_notificationsApi(message).success { message, statusCode }
+      @_ifJobIsNotStopped message, () => @_notificationsApi(message).success { message, statusCode }
 
     _shouldRetry_: (notification, err) =>
       super(notification, err) and err?.detail?.response?.statusCode not in @nonRetryable
@@ -30,9 +30,9 @@ module.exports =
         error
         request: _.omit error.detail.request, ["resolveWithFullResponse"]
       }
-
-      @_notificationsApi(message).fail errorMessage
-        .throw new NonRetryable "Max retry exceeded", error
+      @_ifJobIsNotStopped message, () => 
+        @_notificationsApi(message).fail errorMessage
+          .throw new NonRetryable "Max retry exceeded", error
 
     _notificationsApi: ({ HeadersForRequest, JobId }) =>
       new NotificationsApi {
@@ -40,3 +40,9 @@ module.exports =
         jobId: JobId
         @notificationApiUrl
       }
+
+    _ifJobIsNotStopped: (message, action) =>
+      @_notificationsApi(message).jobIsStopped()
+      .then (jobIsStopped) =>
+        return Promise.resolve() if jobIsStopped
+        action()
