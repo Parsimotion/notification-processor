@@ -27,6 +27,11 @@ _notificationsApiNock = (bodyExpected) ->
     .post "/jobs/#{JOB_ID}/operations", (body) -> _.omit(body, "request").should.be.eql bodyExpected
     .reply 200
 
+_notificationsApiGetJob = (response) ->
+  nock NOTIFICATIONS_URL
+    .get "/jobs/#{JOB_ID}"
+    .reply 200, response or { stopped: false }
+
 describe "JobProcessor", ->
 
   afterEach ->
@@ -35,15 +40,18 @@ describe "JobProcessor", ->
   context "when API response with bad status code", ->
     it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should throw an exception", ->
       _nockAPI(500, "something went wrong!")
+      _notificationsApiGetJob()
       _processJob().should.be.rejected()
 
     it "and dequeue counter is greater than MAX_DEQUEUE_COUNT, should notify for fail to notificationsApi", ->
+      _notificationsApiGetJob()
       mockFailedNotificationWith 500
       _processJob { dequeueCount: 6 }
       .tap -> nock.isDone().should.be.ok()
       .should.be.rejectedWith NonRetryable
 
     it "equal to 400 then is success but should notify for fail to notificationsApi", ->
+      _notificationsApiGetJob()
       mockFailedNotificationWith 400
 
       _processJob()
@@ -53,6 +61,7 @@ describe "JobProcessor", ->
   context "when API response with good status code", ->
     it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should notify for success to notificationsApi", ->
       _nockAPI()
+      _notificationsApiGetJob()
 
       _notificationsApiNock = nock NOTIFICATIONS_URL
       .post "/jobs/#{JOB_ID}/operations"
