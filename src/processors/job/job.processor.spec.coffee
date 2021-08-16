@@ -58,7 +58,6 @@ describe "JobProcessor", ->
 
       _processJob()
       .tap -> nock.isDone().should.be.ok()
-      .tapCatch (a) => console.log('error del test que falla', a)
       .should.be.rejectedWith NonRetryable
 
   context "when API response with good status code", ->
@@ -71,9 +70,10 @@ describe "JobProcessor", ->
 
       _processJob()
       .tap -> _notificationsApiNock.done()
-  context "Stopped jobs", ->
-    it "If job is stopped, should not notify for success to notificationsApi", ->
-      _nockAPI()
+  
+  context "If job is stopped", ->
+    it "should not process message nor notify for success to notificationsApi", ->
+      _apiNock = _nockAPI()
 
       _notificationsApiNock = nock NOTIFICATIONS_URL
       .post "/jobs/#{JOB_ID}/operations"
@@ -82,7 +82,9 @@ describe "JobProcessor", ->
       _notificationsApiGetJob(stopped: true)
 
       _processJob()
-      .tap -> _notificationsApiNock.isDone().should.be.false()
+      .tap -> 
+        _apiNock.isDone().should.be.false()
+        _notificationsApiNock.isDone().should.be.false()
 
 message =
   "Method":"POST"
