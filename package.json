@@ -21,6 +21,7 @@
     "grunt": "^1.0.3",
     "lodash": "^4.17.10",
     "moment": "^2.18.1",
+    "node-cache": "^5.1.2",
     "redis": "^2.7.1",
     "request": "^2.87.0",
     "request-promise": "^4.2.0",

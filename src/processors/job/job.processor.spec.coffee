@@ -27,7 +27,14 @@ _notificationsApiNock = (bodyExpected) ->
     .post "/jobs/#{JOB_ID}/operations", (body) -> _.omit(body, "request").should.be.eql bodyExpected
     .reply 200
 
+_notificationsApiGetJob = (response) ->
+  _.times 2, -> #Los tests no usan la cache para mantener la independencia. Es una request por el process y otra por el notify success/fail. 
+    nock NOTIFICATIONS_URL
+      .get "/jobs/#{JOB_ID}"
+      .reply 200, response or { stopped: false }
 describe "JobProcessor", ->
+  beforeEach ->
+    process.env.NODE_ENV = "test"
 
   afterEach ->
     nock.cleanAll()
@@ -35,15 +42,18 @@ describe "JobProcessor", ->
   context "when API response with bad status code", ->
     it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should throw an exception", ->
       _nockAPI(500, "something went wrong!")
+      _notificationsApiGetJob()
       _processJob().should.be.rejected()
 
     it "and dequeue counter is greater than MAX_DEQUEUE_COUNT, should notify for fail to notificationsApi", ->
+      _notificationsApiGetJob()
       mockFailedNotificationWith 500
       _processJob { dequeueCount: 6 }
       .tap -> nock.isDone().should.be.ok()
       .should.be.rejectedWith NonRetryable
 
     it "equal to 400 then is success but should notify for fail to notificationsApi", ->
+      _notificationsApiGetJob()
       mockFailedNotificationWith 400
 
       _processJob()
@@ -53,13 +63,28 @@ describe "JobProcessor", ->
   context "when API response with good status code", ->
     it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should notify for success to notificationsApi", ->
       _nockAPI()
-
+      _notificationsApiGetJob()
       _notificationsApiNock = nock NOTIFICATIONS_URL
       .post "/jobs/#{JOB_ID}/operations"
       .reply 200
 
       _processJob()
       .tap -> _notificationsApiNock.done()
+  
+  context "If job is stopped", ->
+    it "should not process message nor notify for success to notificationsApi", ->
+      _apiNock = _nockAPI()
+
+      _notificationsApiNock = nock NOTIFICATIONS_URL
+      .post "/jobs/#{JOB_ID}/operations"
+      .reply 200
+
+      _notificationsApiGetJob(stopped: true)
+
+      _processJob()
+      .tap -> 
+        _apiNock.isDone().should.be.false()
+        _notificationsApiNock.isDone().should.be.false()
 
 message =
   "Method":"POST"
