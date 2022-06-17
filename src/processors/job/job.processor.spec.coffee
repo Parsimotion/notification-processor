@@ -33,6 +33,7 @@ _notificationsApiGetJob = (response) ->
       .get "/jobs/#{JOB_ID}"
       .reply 200, response or { stopped: false }
 describe "JobProcessor", ->
+
   beforeEach ->
     process.env.NODE_ENV = "test"
 
@@ -41,11 +42,13 @@ describe "JobProcessor", ->
 
   context "when API response with bad status code", ->
     it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should throw an exception", ->
+      @timeout 10000
       _nockAPI(500, "something went wrong!")
       _notificationsApiGetJob()
       _processJob().should.be.rejected()
 
     it "and dequeue counter is greater than MAX_DEQUEUE_COUNT, should notify for fail to notificationsApi", ->
+      @timeout 10000
       _notificationsApiGetJob()
       mockFailedNotificationWith 500
       _processJob { dequeueCount: 6 }
@@ -53,6 +56,7 @@ describe "JobProcessor", ->
       .should.be.rejectedWith NonRetryable
 
     it "equal to 400 then is success but should notify for fail to notificationsApi", ->
+      @timeout 10000
       _notificationsApiGetJob()
       mockFailedNotificationWith 400
 

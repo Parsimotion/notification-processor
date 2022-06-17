@@ -1,0 +1,9 @@
+#!/bin/bash
+FUNCTION=$1
+
+npm run build 
+echo "Removing old version from $FUNCTION"
+rm -rf "../$FUNCTION/node_modules/notification-processor/lib/" 
+echo "Removed. Copying new version to $FUNCTION"
+cp -R lib/ "../$FUNCTION/node_modules/notification-processor/lib/"
+echo "Done"

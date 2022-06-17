@@ -1,29 +1,35 @@
 _ = require "lodash"
-request = require("request-promise")
+requestPromise = require("request-promise")
 retry = require("bluebird-retry")
 Promise = require("bluebird")
 NodeCache = require("node-cache");
 NOTIFICATIONS_API_JOBS_CACHE_TTL = parseInt(process.env.NOTIFICATIONS_API_JOBS_CACHE_TTL) or 5
 NOTIFICATIONS_API_STOPPED_JOB_CACHE_TTL = parseInt(process.env.NOTIFICATIONS_API_STOPPED_JOB_CACHE_TTL) or 2
+DEFAULT_NOTIFICATIONS_API_ASYNC_URL = process.env.DEFAULT_NOTIFICATIONS_API_ASYNC_URL || "https://apps.producteca.com/aws/notifications-api-async"
 HOUR = 60 * 60
 
 #Para minimizar las requests a notifications-api, cachea unos segundos el estado del job
 jobsCache = new NodeCache({ stdTTL: NOTIFICATIONS_API_JOBS_CACHE_TTL })
 #A nivel dominio, podria ser cache sin TTL porque un job stoppeado queda asi para siempre. Pero se pone TTL de 2h para que luego libere la memoria
 stoppedJobsCache = new NodeCache({ stdTTL: NOTIFICATIONS_API_STOPPED_JOB_CACHE_TTL * HOUR }); 
-
 class NotificationsApi
-  constructor: ({ @notificationApiUrl, @token, @jobId }) ->
+  constructor: ({ @notificationApiUrl, @token, @jobId, @notificationApiAsyncUrl = DEFAULT_NOTIFICATIONS_API_ASYNC_URL }) ->
 
-  success: ({ statusCode }) => retry(( =>
-     @_makeRequest { statusCode, success: yes }
-  ), { max_tries: 3 }).catchReturn()
+  success: (response, options) => 
+    { statusCode } = response;
+    __makeRequest = () => @_makeRequest { statusCode, success: yes }, options
+    __retryRequest = () => @success(response, { useAsyncApi: true })
+    
+    @_retryViaAsyncOrIgnore(__makeRequest, __retryRequest, options)
 
-  fail: ({ statusCode, error, request }) => retry(( =>
+  fail: (response, options) => 
+    { statusCode, error, request } = response
     message = _.get error, "message"
-    @_makeRequest { statusCode, success: no, message, request }
-  ), { max_tries: 3 }).catchReturn()
-  
+    __makeRequest = () => @_makeRequest { statusCode, success: no, message, request }, options
+    __retryRequest = () => @fail(response, { useAsyncApi: true })
+    
+    @_retryViaAsyncOrIgnore(__makeRequest, __retryRequest, options)
+
   jobIsStopped: () => 
     cachedStoppedJob = stoppedJobsCache.get @jobId
     return Promise.resolve cachedStoppedJob if @_shouldUseCachedValue(cachedStoppedJob)
@@ -41,7 +47,7 @@ class NotificationsApi
     .tap (job) => jobsCache.set @jobId, job
 
   _doFetchJob: () => 
-    __fetchJob = () => request({
+    __fetchJob = () => requestPromise({
       url: "#{ @notificationApiUrl }/jobs/#{ @jobId }"
       method: "GET"
       headers: { authorization: @token }
@@ -50,9 +56,18 @@ class NotificationsApi
 
     retry __fetchJob, throw_original: true
 
-  _makeRequest: (body) =>
-    request {
-      url: "#{ @notificationApiUrl }/jobs/#{ @jobId }/operations"
+  _retryViaAsyncOrIgnore: (makeRequest, retryRequest, options = {}) =>    
+    retry(makeRequest, { throw_original: true, max_tries: 3 })
+    .catch (e) =>
+      throw e if options.useAsyncApi
+      console.log("Error sending status to notifications-api. Retrying via notifications-api-async")
+      retryRequest()
+    .catchReturn()
+
+  _makeRequest: (body, { useAsyncApi } = {}) =>
+    url = if useAsyncApi then @notificationApiAsyncUrl else @notificationApiUrl
+    requestPromise {
+      url: "#{ url }/jobs/#{ @jobId }/operations"
       method: "POST"
       headers: { authorization: @token }
       json: body
