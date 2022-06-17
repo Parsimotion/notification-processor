@@ -18,7 +18,7 @@ class NotificationsApi
   success: (response, options) => 
     { statusCode } = response;
     __makeRequest = () => @_makeRequest { statusCode, success: yes }, options
-    __retryRequest = () => @success(response, { async: true })
+    __retryRequest = () => @success(response, { useAsyncApi: true })
     
     @_retryViaAsyncOrIgnore(__makeRequest, __retryRequest, options)
 
@@ -26,7 +26,7 @@ class NotificationsApi
     { statusCode, error, request } = response
     message = _.get error, "message"
     __makeRequest = () => @_makeRequest { statusCode, success: no, message, request }, options
-    __retryRequest = () => @fail(response, { async: true })
+    __retryRequest = () => @fail(response, { useAsyncApi: true })
     
     @_retryViaAsyncOrIgnore(__makeRequest, __retryRequest, options)
 
@@ -59,14 +59,13 @@ class NotificationsApi
   _retryViaAsyncOrIgnore: (makeRequest, retryRequest, options = {}) =>    
     retry(makeRequest, { throw_original: true, max_tries: 3 })
     .catch (e) =>
-      throw e if options.async
+      throw e if options.useAsyncApi
       console.log("Error sending status to notifications-api. Retrying via notifications-api-async")
-      asyncOptions = _.assign({}, options, { async: true })
       retryRequest()
     .catchReturn()
 
-  _makeRequest: (body, { async } = {}) =>
-    url = if async then @notificationApiAsyncUrl else @notificationApiUrl
+  _makeRequest: (body, { useAsyncApi } = {}) =>
+    url = if useAsyncApi then @notificationApiAsyncUrl else @notificationApiUrl
     requestPromise {
       url: "#{ url }/jobs/#{ @jobId }/operations"
       method: "POST"
