@@ -1,5 +1,5 @@
 _ = require "lodash"
-request = require("request-promise")
+requestPromise = require("request-promise")
 retry = require("bluebird-retry")
 Promise = require("bluebird")
 NodeCache = require("node-cache");
@@ -47,7 +47,7 @@ class NotificationsApi
     .tap (job) => jobsCache.set @jobId, job
 
   _doFetchJob: () => 
-    __fetchJob = () => request({
+    __fetchJob = () => requestPromise({
       url: "#{ @notificationApiUrl }/jobs/#{ @jobId }"
       method: "GET"
       headers: { authorization: @token }
@@ -56,18 +56,18 @@ class NotificationsApi
 
     retry __fetchJob, throw_original: true
 
-  _retryViaAsyncOrIgnore: (makeRequest, retryRequest, options) =>    
+  _retryViaAsyncOrIgnore: (makeRequest, retryRequest, options = {}) =>    
     retry(makeRequest, { throw_original: true, max_tries: 3 })
     .catch (e) =>
-      throw e if options.async
+      throw e if options.async or process.env.NODE_ENV is 'test'
       console.log("Error sending status to notifications-api. Retrying via notifications-api-async")
       asyncOptions = _.assign({}, options, { async: true })
-      retryRequest(response, asyncOptions)
+      retryRequest()
     .catchReturn()
 
   _makeRequest: (body, { async } = {}) =>
     url = if async then @notificationApiAsyncUrl else @notificationApiUrl
-    request {
+    requestPromise {
       url: "#{ url }/jobs/#{ @jobId }/operations"
       method: "POST"
       headers: { authorization: @token }
