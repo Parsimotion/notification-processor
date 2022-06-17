@@ -59,7 +59,7 @@ class NotificationsApi
   _retryViaAsyncOrIgnore: (makeRequest, retryRequest, options = {}) =>    
     retry(makeRequest, { throw_original: true, max_tries: 3 })
     .catch (e) =>
-      throw e if options.async or process.env.NODE_ENV is 'test'
+      throw e if options.async
       console.log("Error sending status to notifications-api. Retrying via notifications-api-async")
       asyncOptions = _.assign({}, options, { async: true })
       retryRequest()
