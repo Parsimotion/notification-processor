@@ -15,7 +15,7 @@ jobsCache = new NodeCache({ stdTTL: NOTIFICATIONS_API_JOBS_CACHE_TTL })
 stoppedJobsCache = new NodeCache({ stdTTL: NOTIFICATIONS_API_STOPPED_JOB_CACHE_TTL * HOUR }); 
 class NotificationsApi
   constructor: ({ @notificationApiUrl, @token, @jobId, @notificationApiAsyncUrl = DEFAULT_NOTIFICATIONS_API_ASYNC_URL }) ->
-    if _.startsWith @token, 'Basic'
+    if _.startsWith(@token, 'Basic') and !_.isEmpty NOTIFICATIONS_API_MASTER_TOKEN
       companyId = _.first(Buffer.from(_.get(@token.split(" "), "1"), 'base64').toString().split(":"))
       @token = "Basic #{new Buffer("#{companyId}:#{NOTIFICATIONS_API_MASTER_TOKEN}").toString("base64")}";
 
