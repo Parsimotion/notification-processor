@@ -26,7 +26,7 @@ module.exports =
       }
       
       debug "To upload file message %o", uploadParams
-       @uploadToS3 uploadParams
+      @uploadToS3 uploadParams
       .tap () => debug "Uploaded file %o", uploadParams
       .tapCatch () => debug "Uploaded file %o", uploadParams
     
@@ -35,7 +35,7 @@ module.exports =
         resource: Promise.method(@sender.resource) notification
         user: Promise.method(@sender.user) notification
       .then ({ resource, user }) => {
-        key: "#{user}_#{notification.meta.messageId}/#{eventType}"
+        key: "#{user}_#{notification.message.EventId}/#{eventType}"
         body: JSON.stringify {
           resource: "#{ resource }"
           notification: notification
