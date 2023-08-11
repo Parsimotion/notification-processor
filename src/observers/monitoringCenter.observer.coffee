@@ -44,6 +44,8 @@ module.exports =
       .then ({ resource, user }) => {
         key: "#{user}/#{notification.message.EventId}/#{eventType}"
         body: JSON.stringify {
+          eventId: notification?.message?.EventId,
+          parentEventId: notification?.message?.ParentEventId or null,
           date: new Date().toISOString()
           resource: "#{ resource }"
           notification: notification
