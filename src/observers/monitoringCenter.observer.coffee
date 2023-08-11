@@ -4,10 +4,11 @@ debug = require("debug") "notification-processor:observers:monitor-center"
 AWS = require "aws-sdk"
 
 module.exports = 
-  class MonitorCenterObserver
+  class MonitoringCenterObserver
 
-    constructor: ({ @sender, @clientId, @app, @job, @propertiesToOmit = "auth", connection : { accessKey, secretAccessKey, @bucket } }) ->
-      @s3 = new AWS.S3 { accessKeyId, secretAccessKey }
+    constructor: ({ @sender, @clientId, @app, @job, @propertiesToOmit = "auth", connection : { accessKeyId, secretAccessKey, monitoringCenterBucket, region } }) ->
+      @s3 = new AWS.S3 { accessKeyId, secretAccessKey, region }
+      @bucket = monitoringCenterBucket
       @uploadToS3 = Promise.promisify(@s3.upload).bind(@s3)
     
     listenTo: (observable) ->
