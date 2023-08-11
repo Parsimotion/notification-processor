@@ -1,5 +1,6 @@
 _ = require "lodash"
 Promise = require "bluebird"
+retry = require "bluebird-retry"
 debug = require("debug") "notification-processor:observers:monitor-center"
 AWS = require "aws-sdk"
 
@@ -28,7 +29,8 @@ module.exports =
           Body: body
         }
         debug "Uploading file #{uploadParams.Key} to bucket #{uploadParams.Bucket}"
-        @uploadToS3 uploadParams
+        __uploadToS3 = () => @uploadToS3 uploadParams
+        retry __uploadToS3, { throw_original: true }
         .tap () => debug "Uploaded file #{uploadParams.Key} to bucket #{uploadParams.Bucket}"
         .tapCatch (e) => 
           debug "Error uploading file #{uploadParams.Key} to bucket #{uploadParams.Bucket} %o", e
