@@ -19,17 +19,19 @@ module.exports =
       observable.on "success", (payload) => @uploadTrackingFile(payload, "success")
 
     uploadTrackingFile: ({ id, notification, error }, eventType) =>
-      { key, body } = @_mapper id, notification, error, eventType
-      uploadParams = {
-        Bucket: @bucket, 
-        Key: key, 
-        Body: body
-      }
-      
-      debug "To upload file message %o", uploadParams
-      @uploadToS3 uploadParams
-      .tap () => debug "Uploaded file %o", uploadParams
-      .tapCatch () => debug "Uploaded file %o", uploadParams
+      @_mapper id, notification, error, eventType
+      .then ({ key, body }) => 
+        uploadParams = {
+          Bucket: @bucket, 
+          Key: key, 
+          Body: body
+        }
+        debug "Uploading file #{uploadParams.Key} to bucket #{uploadParams.Bucket}"
+        @uploadToS3 uploadParams
+        .tap () => debug "Uploaded file #{uploadParams.Key} to bucket #{uploadParams.Bucket}"
+        .tapCatch (e) => 
+          debug "Error uploading file #{uploadParams.Key} to bucket #{uploadParams.Bucket} %o", e
+        
     
     _mapper: (id, notification, err, eventType) ->
       Promise.props
