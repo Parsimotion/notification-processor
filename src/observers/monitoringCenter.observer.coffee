@@ -21,6 +21,7 @@ module.exports =
     uploadTrackingFile: ({ id, notification, error }, eventType) =>
       @_mapper id, notification, error, eventType
       .then ({ key, body }) => 
+        return if !key or !body
         uploadParams = {
           Bucket: @bucket, 
           Key: key, 
@@ -34,6 +35,7 @@ module.exports =
         
     
     _mapper: (id, notification, err, eventType) ->
+      return Promise.resolve({ }) if !notification?.message?.EventId
       Promise.props
         resource: Promise.method(@sender.resource) notification
         user: Promise.method(@sender.user) notification
