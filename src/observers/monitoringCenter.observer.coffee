@@ -32,17 +32,18 @@ module.exports =
         __uploadToS3 = () => @uploadToS3 uploadParams
         retry __uploadToS3, { throw_original: true }
         .tap () => debug "Uploaded file #{uploadParams.Key} to bucket #{uploadParams.Bucket}"
-        .tapCatch (e) => 
+        .catch (e) => # We'll do nothing with this error
           debug "Error uploading file #{uploadParams.Key} to bucket #{uploadParams.Bucket} %o", e
         
     
     _mapper: (id, notification, err, eventType) ->
       return Promise.resolve({ }) if !notification?.message?.EventId
+      theRequest = _.get(err, "detail.request") || _.get(err, "cause.detail.request")
       Promise.props
         resource: Promise.method(@sender.resource) notification
         user: Promise.method(@sender.user) notification
       .then ({ resource, user }) => {
-        key: "#{user}/#{notification.message.EventId}/#{eventType}"
+        key: "#{user}/#{notification.message.EventId}/#{@app}|#{@job}|#{eventType}"
         body: JSON.stringify {
           eventId: notification?.message?.EventId,
           parentEventId: notification?.message?.ParentEventId or null,
@@ -51,8 +52,10 @@ module.exports =
           notification: notification
           user: "#{ user }"
           @clientId
-          error: _.omit err, "detail.request"
-          request: _.omit _.get(err, "detail.request"), @propertiesToOmit
+          @job
+          @app
+          error: _.omit(err, ["detail.request", "cause.detail.request"])
+          request: _.omit(theRequest, _.castArray(@propertiesToOmit).concat("auth"))
           type: _.get err, "type", "unknown_error"
           tags: _.get err, "tags", []
         }
