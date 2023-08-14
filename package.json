@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@azure/service-bus": "^1.0.4",
+    "aws-sdk": "^2.1432.0",
     "azure-table-node": "^1.5.0",
     "bluebird": "^3.5.0",
     "bluebird-retry": "~0.10.1",

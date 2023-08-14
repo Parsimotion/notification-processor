@@ -5,6 +5,7 @@ module.exports =
     DelayObserver: require "./observers/delay.observer"
     DeadLetterSucceeded: require "./observers/deadLetterSucceeded.observer"
     IncidentsApi: require "./observers/incidentsApi.observer"
+    MonitoringCenter: require "./observers/monitoringCenter.observer"
   Processors:
     DeadLetterProcessor: require "./processors/deadletter.processor"
     RequestProcessor: require "./processors/request.processor"
