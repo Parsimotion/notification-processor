@@ -72,3 +72,10 @@ const processor = JobsProcessor({
 })
 ```
 
+## To publish
+```
+npm version [major/minor/patch]
+npm publish
+git push origin HEAD
+git push origin HEAD --tags
+```
