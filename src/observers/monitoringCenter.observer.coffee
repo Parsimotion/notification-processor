@@ -43,7 +43,7 @@ module.exports =
         resource: Promise.method(@sender.resource) notification
         user: Promise.method(@sender.user) notification
       .then ({ resource, user }) => {
-        key: "#{user}/#{notification.message.EventId}/#{@app}|#{@job}|#{eventType}"
+        key: "#{user}/#{notification.message.EventId}/#{@app}|#{@job}|#{eventType}|#{new Date().toISOString()}"
         body: JSON.stringify {
           eventId: notification?.message?.EventId,
           parentEventId: notification?.message?.ParentEventId or null,
