@@ -17,7 +17,7 @@ module.exports =
       observable.on "unsuccessful", (payload) => @uploadTrackingFile(payload, "unsuccessful")
       observable.on "started", (payload) => @uploadTrackingFile(payload, "started")
       observable.on "finished", (payload) => @uploadTrackingFile(payload, "finished")
-      observable.on "success", (payload) => @uploadTrackingFile(payload, "success")
+      observable.on "successful", (payload) => @uploadTrackingFile(payload, "successful")
 
     uploadTrackingFile: ({ id, notification, error }, eventType) =>
       @_mapper id, notification, error, eventType
