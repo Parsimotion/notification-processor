@@ -17,7 +17,7 @@ module.exports =
       notification = @source.newNotification { context, id, message: raw }
 
       @_emitEvent "started", { context, id, notification }
-      $promise = Promise.method(@runner) notification, context
+      $promise = Promise.method(@runner) notification, context, id
       $promise = $promise.timeout(@timeout, "processor timeout") if @timeout?
 
       execute = () =>
