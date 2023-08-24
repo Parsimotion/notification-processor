@@ -16,7 +16,6 @@ module.exports =
       observable.on "unsuccessful_non_retryable", (payload) => @uploadTrackingFile(payload, "unsuccessful_non_retryable")
       observable.on "unsuccessful", (payload) => @uploadTrackingFile(payload, "unsuccessful")
       observable.on "started", (payload) => @uploadTrackingFile(payload, "started")
-      observable.on "finished", (payload) => @uploadTrackingFile(payload, "finished")
       observable.on "successful", (payload) => @uploadTrackingFile(payload, "successful")
 
     uploadTrackingFile: ({ id, notification, error }, eventType) =>
@@ -52,7 +51,7 @@ module.exports =
           notification: notification
           user: "#{ user }"
           @clientId
-          @job
+          @jobId    
           @app
           error: _.omit(err, ["detail.request", "cause.detail.request"])
           request: _.omit(theRequest, _.castArray(@propertiesToOmit).concat("auth"))
