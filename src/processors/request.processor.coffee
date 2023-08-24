@@ -26,8 +26,8 @@ __isIncludedInStatusesError = (conditions) -> (err) ->
   .map (it) -> _.get(errorConditions, it, _.partial(_.isEqual, it)) 
   .some (condition) -> condition statusCode
 
-module.exports = (requestGenerator, { silentErrors = [], nonRetryable = [] } = {}) -> (notification) ->
-  Promise.method(requestGenerator) notification
+module.exports = (requestGenerator, { silentErrors = [], nonRetryable = [] } = {}) -> (notification, context, executionId) ->
+  Promise.method(requestGenerator) notification, context, executionId
   .then (options) -> 
     request options
     .promise()
