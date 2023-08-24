@@ -52,7 +52,7 @@ module.exports =
           notification: notification
           user: "#{ user }"
           @clientId
-          @jobId    
+          @job
           @app
           error: _.omit(err, ["detail.request", "cause.detail.request"])
           request: _.omit(theRequest, _.castArray(@propertiesToOmit).concat("auth"))
