@@ -29,7 +29,7 @@ class NotificationsApi
   fail: (response, options) => 
     { statusCode, error, request } = response
     message = _.get error, "message"
-    error = _.get error, "error"
+    error = _.get error, "type"
     __makeRequest = () => @_makeRequest { statusCode, success: no, message, error, request }, options
     __retryRequest = () => @fail(response, { useAsyncApi: true })
     
