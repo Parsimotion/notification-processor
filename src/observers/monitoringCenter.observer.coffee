@@ -3,37 +3,36 @@ Promise = require "bluebird"
 retry = require "bluebird-retry"
 debug = require("debug") "notification-processor:observers:monitor-center"
 AWS = require "aws-sdk"
+moment = require "moment"
 
 module.exports = 
   class MonitoringCenterObserver
 
-    constructor: ({ @sender, @clientId, @app, @job, @propertiesToOmit = "auth", connection : { accessKeyId, secretAccessKey, monitoringCenterBucket, region } }) ->
-      @s3 = new AWS.S3 { accessKeyId, secretAccessKey, region }
-      @bucket = monitoringCenterBucket
-      @uploadToS3 = Promise.promisify(@s3.upload).bind(@s3)
+    constructor: ({ @sender, @clientId, @app, @job, @propertiesToOmit = "auth", connection : { accessKeyId, secretAccessKey, @deliveryStream, region } }) ->
+      @firehose = new AWS.Firehose { accessKeyId, secretAccessKey, region }
+      @uploadToFirehose = Promise.promisify(@firehose.putRecord).bind(@firehose)
     
     listenTo: (observable) ->
       observable.on "unsuccessful_non_retryable", (payload) => @uploadTrackingFile(payload, "unsuccessful_non_retryable")
       observable.on "unsuccessful", (payload) => @uploadTrackingFile(payload, "unsuccessful")
-      observable.on "started", (payload) => @uploadTrackingFile(payload, "started")
+      observable.on "started", (payload) => @uploadTrackingFile(payload, "pending")
       observable.on "successful", (payload) => @uploadTrackingFile(payload, "successful")
 
     uploadTrackingFile: ({ id, notification, error }, eventType) =>
       @_mapper id, notification, error, eventType
-      .then ({ key, body }) => 
-        return if !key or !body
+      .then (record) => 
+        return if _.isEmpty(record)
+
         uploadParams = {
-          Bucket: @bucket, 
-          Key: key, 
-          Body: body
+          DeliveryStreamName: @deliveryStream, 
+          Record: Data: JSON.stringify(record)
         }
-        debug "Uploading file #{uploadParams.Key} to bucket #{uploadParams.Bucket}"
-        __uploadToS3 = () => @uploadToS3 uploadParams
-        retry __uploadToS3, { throw_original: true }
-        .tap () => debug "Uploaded file #{uploadParams.Key} to bucket #{uploadParams.Bucket}"
+        debug "Uploading file #{record.event} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
+        __uploadToFirehose = () => @uploadToFirehose uploadParams
+        retry __uploadToFirehose, { throw_original: true }
+        .tap () => debug "Uploaded file #{record.event} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
         .catch (e) => # We'll do nothing with this error
-          debug "Error uploading file #{uploadParams.Key} to bucket #{uploadParams.Bucket} %o", e
-        
+          debug "Error uploading file #{record.event} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e  
     
     _mapper: (id, notification, err, eventType) ->
       return Promise.resolve({ }) if !notification?.message?.EventId
@@ -41,24 +40,42 @@ module.exports =
       Promise.props
         resource: Promise.method(@sender.resource) notification
         user: Promise.method(@sender.user) notification
-      .then ({ resource, user }) => {
-        key: "#{user}/#{notification.message.EventId}/#{id}/#{@app}|#{@job}|#{eventType}|#{new Date().toISOString()}"
-        body: JSON.stringify {
-          eventId: notification?.message?.EventId,
-          parentEventId: notification?.message?.ParentEventId or null,
+      .then ({ resource, user }) => 
+        now = new Date()
+        {
+          id
           executionId: id
-          date: new Date().toISOString()
-          resource: "#{ resource }"
-          notification: notification
-          user: "#{ user }"
-          @clientId
-          @job
-          @app
-          error: _.omit(err, ["detail.request", "cause.detail.request"])
-          request: _.omit(theRequest, _.castArray(@propertiesToOmit).concat("auth"))
-          type: _.get err, "type", "unknown_error"
-          tags: _.get err, "tags", []
+          app: parseInt @clientId
+          type: "service-bus|#{@app}|#{@job}"
+          company: "#{ user }" 
+          user: null #TODO: Chequear si podemos completar esto
+          event: notification?.message?.EventId,
+          parent: notification?.message?.ParentEventId or null,
+          externalreference: null
+          timestamp: now.getTime()
+          date: now.toISOString()
+          year: moment(now).format('YYYY')
+          month: moment(now).format('MM')
+          day: moment(now).format('DD')
+          hour: moment(now).format('HH')
+          payload: JSON.stringify({
+            @clientId
+            @job
+            @app
+            error: _.omit(err, ["detail.request", "cause.detail.request"])
+            request: _.omit(theRequest, _.castArray(@propertiesToOmit).concat("auth"))
+            type: _.get err, "type", "unknown_error"
+            tags: _.get err, "tags", []
+          })
+          status: eventType
+          resource
+          # Generic app fields
+          integration: null # TODO
+          event_timestamp: null #TODO
+          output_message: null #TODO
+          user_settings_version: null #TODO
+          env_version: null #TODO
+          code_version: null #TODO
         }
-      }
 
-   
+
