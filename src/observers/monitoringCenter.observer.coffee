@@ -46,7 +46,7 @@ module.exports =
           id
           executionId: id
           app: parseInt @clientId
-          type: "service-bus|#{@app}|#{@job}"
+          type: "service-bus"
           company: "#{ user }" 
           user: null #TODO: Chequear si podemos completar esto
           event: notification?.message?.EventId,
@@ -69,8 +69,8 @@ module.exports =
           })
           status: eventType
           resource
+          integration: "#{@app}|#{@job}"
           # Generic app fields
-          integration: null # TODO
           event_timestamp: null #TODO
           output_message: null #TODO
           user_settings_version: null #TODO
