@@ -42,6 +42,7 @@ module.exports =
         user: Promise.method(@sender.user) notification
       .then ({ resource, user }) => 
         now = new Date()
+        messageDate = new Date(notification?.message?.Sent).getTime() if notification?.message?.Sent
         {
           id
           executionId: id
@@ -71,7 +72,7 @@ module.exports =
           resource
           integration: "#{@app}|#{@job}"
           # Generic app fields
-          event_timestamp: null #TODO
+          event_timestamp: messageDate or now.getTime()
           output_message: null #TODO
           user_settings_version: null #TODO
           env_version: null #TODO
