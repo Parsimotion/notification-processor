@@ -65,7 +65,7 @@ module.exports =
             @app
             error: _.omit(err, ["detail.request", "cause.detail.request"])
             request: _.omit(theRequest, _.castArray(@propertiesToOmit).concat("auth"))
-            type: _.get err, "type", "unknown_error"
+            type: err && _.get(err, "type", "unknown")
             tags: _.get err, "tags", []
           })
           status: eventType
