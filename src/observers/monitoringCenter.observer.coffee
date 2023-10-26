@@ -42,6 +42,7 @@ module.exports =
         user: Promise.method(@sender.user) notification
       .then ({ resource, user }) => 
         now = new Date()
+        messageDate = new Date(notification?.message?.Sent).getTime() if notification?.message?.Sent
         {
           id
           executionId: id
@@ -64,15 +65,15 @@ module.exports =
             @app
             error: _.omit(err, ["detail.request", "cause.detail.request"])
             request: _.omit(theRequest, _.castArray(@propertiesToOmit).concat("auth"))
-            type: _.get err, "type", "unknown_error"
+            type: err && _.get(err, "type", "unknown")
             tags: _.get err, "tags", []
           })
           status: eventType
           resource
           integration: "#{@app}|#{@job}"
           # Generic app fields
-          event_timestamp: null #TODO
-          output_message: null #TODO
+          event_timestamp: messageDate or now.getTime()
+          output_message: _.get(err, "type")
           user_settings_version: null #TODO
           env_version: null #TODO
           code_version: null #TODO
