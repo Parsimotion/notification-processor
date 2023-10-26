@@ -73,7 +73,7 @@ module.exports =
           integration: "#{@app}|#{@job}"
           # Generic app fields
           event_timestamp: messageDate or now.getTime()
-          output_message: _.get(error, "type")
+          output_message: _.get(err, "type")
           user_settings_version: null #TODO
           env_version: null #TODO
           code_version: null #TODO
