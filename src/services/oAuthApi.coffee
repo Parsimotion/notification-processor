@@ -8,7 +8,7 @@ class AuthApi
   
   companyId: () => @_me().get("id") #TODO: Esto esta mal? deberia ser company.id
   
-  _me: () => @_doRequest("get", "/users/me", { access_token: @accessToken }) #TODO: Agregar cache aca!
+  _me: () => @_doRequest("get", "/users/me", { access_token: @accessToken, fromNotificationProcessor: true }) #TODO: Agregar cache aca!
   
   
   _doRequest: (verb, path, qs = {}) => 
