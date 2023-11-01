@@ -19,3 +19,16 @@ module.exports =
   resource: ({ message }, resourceGetter) => 
     if _.isFunction resourceGetter then resourceGetter message else _.get message, "Resource"
   
+  monitoringCenterFields: (notification) ->
+    { Value: eventId } = _.find(notification.message.HeadersForRequest, (header) => header.Key is "x-producteca-event-id" or header.Key is "X-producteca-event-id" }) or {}
+    Promise.props { 
+      eventType: 'http'
+      resource: @resource(notification)
+      companyId: @user(notification)
+      userId: null
+      externalReference: null
+      userExternalReference: null
+      eventId: eventId
+      eventTimestamp: new Date(notification?.meta?.insertionTime).getTime() if notification?.meta?.insertionTime
+      parentEventId: null
+    }
