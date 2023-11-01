@@ -7,11 +7,10 @@ module.exports =
     Promise.props { 
       eventType: 'http'
       resource: null
-      companyId: null
+      companyId: _companyId(@user(notification))
       userId: null
       externalReference: @resource(notification)
-      userExternalReference: @user(notification)
-      eventId: uuid()
+      eventId: notification?.message?._id or uuid()
       eventTimestamp: new Date(notification?.meta?.insertionTime).getTime() if notification?.meta?.insertionTime
       parentEventId: null
     }

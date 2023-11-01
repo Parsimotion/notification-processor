@@ -1,6 +1,7 @@
 _ = require("lodash");
 OAuthApi = require("../services/oAuthApi");
 Promise = require("bluebird")
+uuid = require("uuid/v4")
 
 _companyId = (method, token) =>
   if (method != "Basic")
@@ -22,7 +23,7 @@ module.exports =
     if _.isFunction resourceGetter then resourceGetter message else _.get message, "Resource"
   
   monitoringCenterFields: (notification) ->
-    eventId = _headerValue(notification.message.HeadersForRequest, "x-producteca-event-id", null) or _headerValue(notification.message.HeadersForRequest, "X-producteca-event-id", null)
+    eventId = _headerValue(notification.message.HeadersForRequest, "x-producteca-event-id", null) or _headerValue(notification.message.HeadersForRequest, "X-producteca-event-id", null) or uuid()
     Promise.props { 
       eventType: 'http'
       resource: @resource(notification)
@@ -30,7 +31,7 @@ module.exports =
       userId: null
       externalReference: null
       userExternalReference: null
-      eventId: eventId
+      eventId: eventId #TODO: Sacar el id de la meta del mensaje? 
       eventTimestamp: new Date(notification?.meta?.insertionTime).getTime() if notification?.meta?.insertionTime #TODO: No es exactamente el timestamp del evento? es el de cuando llega a la cola de async...
       parentEventId: null
     }
