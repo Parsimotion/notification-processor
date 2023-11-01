@@ -33,26 +33,23 @@ module.exports =
         .tap () => debug "Uploaded file #{record.event} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
         .catch (e) => # We'll do nothing with this error
           debug "Error uploading file #{record.event} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e  
-    
     _mapper: (id, notification, err, eventType) ->
-      return Promise.resolve({ }) if !notification?.message?.EventId
-      theRequest = _.get(err, "detail.request") || _.get(err, "cause.detail.request")
-      Promise.props
-        resource: Promise.method(@sender.resource) notification
-        user: Promise.method(@sender.user) notification
-      .then ({ resource, user }) => 
+       Promise.method(@sender.monitoringCenterFields) notification
+      .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId }) => 
+        return Promise.resolve({ }) if !eventId
+        theRequest = _.get(err, "detail.request") || _.get(err, "cause.detail.request")
         now = new Date()
-        messageDate = new Date(notification?.message?.Sent).getTime() if notification?.message?.Sent
         {
           id
           executionId: id
           app: parseInt @clientId
-          type: "service-bus"
-          company: "#{ user }" 
-          user: null #TODO: Chequear si podemos completar esto
-          event: notification?.message?.EventId,
-          parent: notification?.message?.ParentEventId or null,
-          externalreference: null
+          type: eventType
+          company: companyId 
+          user: userId
+          event: eventId,
+          parent: parentEventId,
+          externalreference: externalReference
+          userexternalreference: userExternalReference
           timestamp: now.getTime()
           date: now.toISOString()
           year: moment(now).format('YYYY')
@@ -72,7 +69,7 @@ module.exports =
           resource
           integration: "#{@app}|#{@job}"
           # Generic app fields
-          event_timestamp: messageDate or now.getTime()
+          event_timestamp: eventTimestamp or now.getTime()
           output_message: _.get(err, "type")
           user_settings_version: null #TODO
           env_version: null #TODO
