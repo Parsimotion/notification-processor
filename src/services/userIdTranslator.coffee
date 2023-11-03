@@ -1,10 +1,11 @@
 _ = require("lodash")
 Promise = require("bluebird")
 request = require("request-promise")
-errors = require("request-promise/errors")
 retry = require("bluebird-retry")
 NodeCache = require("node-cache")
 translatedCache = new NodeCache { stdTTL: 0, checkperiod: 0 }
+MERCADOLIBRE_API_URL = process.env.MERCADOLIBRE_API_URL or "https://apps.producteca.com/mercadolibre-api"
+MERCADOLIBRE_API_MASTER_TOKEN = process.env.MERCADOLIBRE_API_MASTER_TOKEN 
 
 module.exports = class UserIdTranslater
     constructor: (@appsToTranslate) ->
@@ -12,6 +13,7 @@ module.exports = class UserIdTranslater
         @translate = @translate.bind(this)
 
     translate: (userId, app) =>
+        return Promise.resolve(null) if not MERCADOLIBRE_API_MASTER_TOKEN
         if _.includes(@appsToTranslate, app) then @getCompanyId(userId) else Promise.resolve(userId)
 
     getCompanyId: (userId) =>
@@ -27,12 +29,12 @@ module.exports = class UserIdTranslater
     _translateUserId: (userId) =>
         console.log("Making request to translate", userId)
         retry () => request.get({
-            url: "#{meliApi.url}/users/me",
+            url: "#{MERCADOLIBRE_API_URL}/users/me",
             json: true,
             qs: { authenticationType: "mercadolibre" },
             auth: {
                 user: "#{userId}",
-                password: meliApi.masterToken
+                password: MERCADOLIBRE_API_MASTER_TOKEN
             }
         })
         .promise()
