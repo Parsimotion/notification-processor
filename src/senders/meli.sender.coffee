@@ -1,6 +1,6 @@
 uuid = require "uuid/v4"
 Promise = require "bluebird"
-UserIdTranslator = require "../services/userIdTranlator"
+UserIdTranslator = require "../services/userIdTranslator"
 module.exports =
   user: ({ message: { user_id } }) -> user_id
   resource: ({ message: { resource } }) -> resource

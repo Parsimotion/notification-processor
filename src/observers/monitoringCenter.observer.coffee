@@ -34,7 +34,7 @@ module.exports =
         .catch (e) => # We'll do nothing with this error
           debug "Error uploading file #{record.event} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e  
     _mapper: (id, notification, err, eventType) ->
-       Promise.method(@sender.monitoringCenterFields) notification
+      Promise.method(@sender.monitoringCenterFields)(notification)
       .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId }) => 
         return Promise.resolve({ }) if !eventId
         theRequest = _.get(err, "detail.request") || _.get(err, "cause.detail.request")

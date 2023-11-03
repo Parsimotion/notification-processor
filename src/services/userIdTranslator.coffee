@@ -4,7 +4,7 @@ request = require("request-promise")
 retry = require("bluebird-retry")
 NodeCache = require("node-cache")
 translatedCache = new NodeCache { stdTTL: 0, checkperiod: 0 }
-MERCADOLIBRE_API_URL = process.env.MERCADOLIBRE_API_URL or "https://apps.producteca.com/mercadolibre-api"
+MERCADOLIBRE_API_CORE_URL = process.env.MERCADOLIBRE_API_CORE_URL or "https://apps.producteca.com/mercadolibre-api"
 MERCADOLIBRE_API_MASTER_TOKEN = process.env.MERCADOLIBRE_API_MASTER_TOKEN 
 
 module.exports = class UserIdTranslator
@@ -29,7 +29,7 @@ module.exports = class UserIdTranslator
     _translateUserId: (userId) =>
         console.log("Making request to translate", userId)
         retry () => request.get({
-            url: "#{MERCADOLIBRE_API_URL}/users/me",
+            url: "#{MERCADOLIBRE_API_CORE_URL}/users/me",
             json: true,
             qs: { authenticationType: "mercadolibre" },
             auth: {
