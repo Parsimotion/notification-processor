@@ -9,7 +9,6 @@ module.exports =
       companyId: @user(notification)
       userId: notification?.message?.UserId or notification?.message?.User
       externalReference: null
-      userExternalReference: null
       eventId: notification?.message?.EventId
       eventTimestamp: new Date(notification?.meta?.insertionTime or notification?.message?.Sent).getTime() if notification?.meta?.insertionTime or notification?.message?.Sent
       parentEventId: notification?.message?.ParentEventId

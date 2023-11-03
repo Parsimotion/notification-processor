@@ -30,7 +30,6 @@ module.exports =
       companyId: @user(notification)
       userId: null
       externalReference: null
-      userExternalReference: null
       eventId: eventId #TODO: Sacar el id de la meta del mensaje? 
       eventTimestamp: new Date(notification?.meta?.insertionTime).getTime() if notification?.meta?.insertionTime #TODO: No es exactamente el timestamp del evento? es el de cuando llega a la cola de async...
       parentEventId: null
