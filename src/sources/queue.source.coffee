@@ -8,9 +8,13 @@ create = (Type) -> (opts) ->
   new Type _(opts).omit([ "queue" ]).defaults(path: "#{queue}").value()
 
 module.exports =
-  newNotification: ({ context: { bindingData : { insertionTime, dequeueCount } }, message }) ->
+  newNotification: ({ context: { bindingData : { insertionTime, dequeueCount, messageId, message, Message, MessageId } }, message }) ->
     message: message
-    meta: { insertionTime, dequeueCount }
+    meta: { 
+      insertionTime, 
+      dequeueCount,
+      messageId: messageId or MessageId or message or Message
+    }
     type: "as"
 
   delayObserver: create DelayObserver
