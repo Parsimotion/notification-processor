@@ -27,12 +27,12 @@ module.exports =
           DeliveryStreamName: @deliveryStream, 
           Record: Data: JSON.stringify(record)
         }
-        debug "Uploading file #{record.event} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
+        debug "Uploading file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
         __uploadToFirehose = () => @uploadToFirehose uploadParams
         retry __uploadToFirehose, { throw_original: true }
-        .tap () => debug "Uploaded file #{record.event} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
+        .tap () => debug "Uploaded file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
         .catch (e) => # We'll do nothing with this error
-          debug "Error uploading file #{record.event} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e  
+          debug "Error uploading file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e  
     _mapper: (id, notification, err, eventType) ->
       Promise.method(@sender.monitoringCenterFields.bind(@sender))(notification)
       .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId }) => 
