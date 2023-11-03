@@ -7,14 +7,14 @@ translatedCache = new NodeCache { stdTTL: 0, checkperiod: 0 }
 MERCADOLIBRE_API_URL = process.env.MERCADOLIBRE_API_URL or "https://apps.producteca.com/mercadolibre-api"
 MERCADOLIBRE_API_MASTER_TOKEN = process.env.MERCADOLIBRE_API_MASTER_TOKEN 
 
-module.exports = class UserIdTranslater
-    constructor: (@appsToTranslate) ->
+module.exports = class UserIdTranslator
+    constructor: () ->
         @translatedCache = translatedCache
         @translate = @translate.bind(this)
 
-    translate: (userId, app) =>
+    translate: (userId) =>
         return Promise.resolve(null) if not MERCADOLIBRE_API_MASTER_TOKEN
-        if _.includes(@appsToTranslate, app) then @getCompanyId(userId) else Promise.resolve(userId)
+        @getCompanyId(userId)
 
     getCompanyId: (userId) =>
         companyId = @translatedCache.get(userId)
