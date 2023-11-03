@@ -1,6 +1,7 @@
-_ = require("lodash");
-OAuthApi = require("../services/oAuthApi");
+_ = require("lodash")
+OAuthApi = require("../services/oAuthApi")
 Promise = require("bluebird")
+retry = require("bluebird-retry")
 uuid = require("uuid/v4")
 
 _companyIdFromBasicToken = (token) =>
@@ -28,12 +29,12 @@ module.exports =
   monitoringCenterFields: (notification) ->
     __scopes = () =>
       [method, token] = _headerValue(notification.message.HeadersForRequest, "Authorization", "").split(" ")
-      return new OAuthApi(token).scopes() if _(method.toLowerCase()).includes("bearer")
+      return retry(() => new OAuthApi(token).scopes()) if _(method.toLowerCase()).includes("bearer")
       Promise.resolve { id: null, appId: null, companyId: _companyIdFromBasicToken(token) }
 
     __scopes()
     .then ({ id, companyId, appId }) =>
-      eventId = _headerValue(notification.message.HeadersForRequest, "x-producteca-event-id", null) or _headerValue(notification.message.HeadersForRequest, "X-producteca-event-id", null) or uuid()
+      eventId = _headerValue(notification.message.HeadersForRequest, "job", null) or _headerValue(notification.message.HeadersForRequest, "Job", null) or _headerValue(notification.message.HeadersForRequest, "x-producteca-event-id", null) or _headerValue(notification.message.HeadersForRequest, "X-producteca-event-id", null) or notification?.meta?.messageId or uuid()
       Promise.props { 
         eventType: 'http'
         resource: @resource(notification)
@@ -41,7 +42,7 @@ module.exports =
         userId: id
         app: parseInt appId
         externalReference: null
-        eventId: eventId #TODO: Sacar el id de la meta del mensaje? 
+        eventId: eventId 
         eventTimestamp: new Date(notification?.meta?.insertionTime).getTime() if notification?.meta?.insertionTime #TODO: No es exactamente el timestamp del evento? es el de cuando llega a la cola de async...
         parentEventId: null
       }
