@@ -11,6 +11,6 @@ module.exports =
       externalReference: null
       userExternalReference: null
       eventId: notification?.message?.EventId
-      eventTimestamp: new Date(notification?.message?.Sent).getTime() if notification?.message?.Sent
+      eventTimestamp: new Date(notification?.meta?.insertionTime or notification?.message?.Sent).getTime() if notification?.meta?.insertionTime or notification?.message?.Sent
       parentEventId: notification?.message?.ParentEventId
     }
