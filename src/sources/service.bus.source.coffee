@@ -10,7 +10,7 @@ create = (Type) -> (opts) ->
 
 module.exports =
   newNotification: ({ context: { bindingData }, message }) ->
-    message: _.omit message, "Sent" #TODO: whyyyyy
+    message: _.omit message, "Sent"
     meta:
       messageId: bindingData.messageId
       insertionTime: bindingData.enqueuedTimeUtc
