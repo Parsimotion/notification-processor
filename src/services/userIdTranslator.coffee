@@ -36,8 +36,7 @@ module.exports = class UserIdTranslator
                 user: "#{userId}",
                 password: MERCADOLIBRE_API_MASTER_TOKEN
             }
-        })
-        .promise()
+        }).promise()
         .then (userInformation) => userInformation.tenantId || userInformation.companyId
         .tap (companyId) => console.log("UserId translated %s ==> %s", userId, companyId)
         .then (companyId) => companyId.toString()
