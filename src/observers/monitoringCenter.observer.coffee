@@ -42,7 +42,7 @@ module.exports =
         {
           id
           executionId: id
-          app: app or parseInt @clientId
+          app: app or parseInt(@clientId) or null
           type: eventType
           company: companyId 
           user: userId
