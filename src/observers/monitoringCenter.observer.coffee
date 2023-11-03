@@ -35,14 +35,14 @@ module.exports =
           debug "Error uploading file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e  
     _mapper: (id, notification, err, eventType) ->
       Promise.method(@sender.monitoringCenterFields.bind(@sender))(notification)
-      .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId }) => 
+      .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId, app }) => 
         return Promise.resolve({ }) if !eventId
         theRequest = _.get(err, "detail.request") || _.get(err, "cause.detail.request")
         now = new Date()
         {
           id
           executionId: id
-          app: parseInt @clientId
+          app: app or parseInt @clientId
           type: eventType
           company: companyId 
           user: userId

@@ -20,10 +20,10 @@ module.exports = class UserIdTranslator
         companyId = @translatedCache.get(userId)
         if companyId then Promise.resolve(companyId) else @_translateUserId(userId)
 
-    _setInCache: (userId, CompanyId) =>
-        success = @translatedCache.set(userId, CompanyId)
+    _setInCache: (userId, userInfo) =>
+        success = @translatedCache.set(userId, userInfo)
         if success
-            console.log("UserId %s ===> %s was stored in cache successfully", userId, CompanyId)
+            console.log("UserId %s ===> %s was stored in cache successfully", userId, JSON.stringify(userInfo))
         Promise.resolve(success)
 
     _translateUserId: (userId) =>
@@ -37,9 +37,8 @@ module.exports = class UserIdTranslator
                 password: MERCADOLIBRE_API_MASTER_TOKEN
             }
         }).promise()
-        .then (userInformation) => userInformation.tenantId || userInformation.companyId
-        .tap (companyId) => console.log("UserId translated %s ==> %s", userId, companyId)
-        .then (companyId) => companyId.toString()
+        .then (userInformation) => { app: userInformation.app, companyId: userInformation.tenantId or userInformation.companyId }
+        .tap ({ companyId }) => console.log("UserId translated %s ==> %s", userId, companyId)
         .catch (reason) =>
             return "Unknown" if _.includes([ 401, 500 ], reason.statusCode)
             throw reason

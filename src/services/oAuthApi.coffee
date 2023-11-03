@@ -14,7 +14,7 @@ class AuthApi
     @_me().get("id") #TODO: Esto esta mal? deberia ser company.id
     .tap (id) => translatedCache.set(@accessToken, { id })
   
-  _me: () => @_doRequest("get", "/users/me", { access_token: @accessToken, fromNotificationProcessor: true }) 
+  _me: () => @_doRequest("get", "/users/me", { access_token: @accessToken, fromNotificationProcessor: true })
   
   
   _doRequest: (verb, path, qs = {}) => 
