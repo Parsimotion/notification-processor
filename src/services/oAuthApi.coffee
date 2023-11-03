@@ -11,7 +11,7 @@ class OAuthApi
   scopes: () => 
     cachedValue = translatedCache.get(@accessToken)
     return Promise.resolve(cachedValue) if cachedValue
-    @_scopes() #TODO: Esto esta mal? deberia ser company.id
+    @_scopes()
     .tap ({ id, companyId, appId }) => translatedCache.set(@accessToken, { id, companyId, appId })
   
   _scopes: () => @_doRequest("get", "/scopes", { access_token: @accessToken, fromNotificationProcessor: true })

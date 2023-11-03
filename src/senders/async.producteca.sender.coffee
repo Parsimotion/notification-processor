@@ -26,7 +26,6 @@ module.exports =
     if _.isFunction resourceGetter then resourceGetter message else _.get message, "Resource"
   
   monitoringCenterFields: (notification) ->
-    console.log("el this async", @)
     __scopes = () =>
       [method, token] = _headerValue(notification.message.HeadersForRequest, "Authorization", "").split(" ")
       return new OAuthApi(token).scopes() if _(method.toLowerCase()).includes("bearer")
