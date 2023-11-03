@@ -3,7 +3,7 @@ OAuthApi = require("../services/oAuthApi");
 Promise = require("bluebird")
 uuid = require("uuid/v4")
 
-_companyIdFromBasicToken: (token) =>
+_companyIdFromBasicToken = (token) =>
   decoded = Buffer.from(token, "base64").toString()
   _.split(decoded, ":")[0]
 
