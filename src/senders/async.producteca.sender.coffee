@@ -36,23 +36,31 @@ module.exports =
       return retry(() => new OAuthApi(token).scopes()) if _(method.toLowerCase()).includes("bearer")
       Promise.resolve { id: null, appId: null, companyId: _companyIdFromBasicToken(token) }
 
-    __jobName = () => notificationsApi.jobName(notification.message.JobId, fullToken).catchReturn() if notification.message.JobId and fullToken
+    __job = () => 
+      if notification.message.JobId and fullToken
+        notificationsApi.fetchJob(notification.message.JobId, fullToken)
+        .catchReturn()
+        .then (it) => it or {} 
+      else 
+        Promise.resolve {}
 
     Promise.props {
       scopes: __scopes(),
-      jobName: __jobName(),
+      job: __job(),
     }
-    .then ({ scopes: { id, companyId, appId }, jobName }) =>
+    .then ({ scopes: { id, companyId, appId }, job: { name, creationDate } }) =>
       eventId = notification.message.JobId or _headerValue(notification.message.HeadersForRequest, "x-producteca-event-id", null) or _headerValue(notification.message.HeadersForRequest, "X-producteca-event-id", null) or notification?.meta?.messageId or uuid()
+      jobCreationDate = new Date(creationDate).getTime() if creationDate
+      messageInsertionTime = new Date(notification?.meta?.insertionTime).getTime() if notification?.meta?.insertionTime 
       Promise.props { 
         eventType: 'http'
         resource: @resource(notification)
         companyId: companyId
         userId: id
         app: parseInt appId
-        job: jobName
+        job: name
         externalReference: null
         eventId: eventId 
-        eventTimestamp: new Date(notification?.meta?.insertionTime).getTime() if notification?.meta?.insertionTime #TODO: No es exactamente el timestamp del evento? es el de cuando llega a la cola de async...
+        eventTimestamp: jobCreationDate or messageInsertionTime
         parentEventId: null
       }

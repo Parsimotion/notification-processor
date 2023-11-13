@@ -50,6 +50,8 @@ class NotificationsApi
     @_fetchJob(jobId, token)
     .then (job) => job.stopped
 
+  fetchJob: (aJobId, aToken) => @_fetchJob(aJobId, aToken)
+  
   _fetchJob: (aJobId, aToken) => 
     jobId = aJobId or @jobId
     cachedJob = jobsCache.get jobId
