@@ -7,12 +7,12 @@ _normalizeHeaders = (headers) ->
     .fromPairs()
     .value()
 
-builderRequest = (apiUrl, fullResponse) -> ({ message }) ->
-  { Resource, Method, Body, HeadersForRequest } = message
+builderRequest = (apiUrl, fullResponse) -> ({ message }, context, executionId) ->
+  { Resource, Method, Body, HeadersForRequest, JobId } = message
   json = if Body?.length > 0 then JSON.parse(Body) else true
 
   headers = _normalizeHeaders HeadersForRequest
-
+  headers['x-producteca-event-id'] = "#{JobId}/#{executionId}" if JobId
   url = headers.Domain || apiUrl;
 
   return {
