@@ -24,7 +24,7 @@ mockFailedNotificationWith = (badStatusCode) ->
 
 _notificationsApiNock = (bodyExpected) ->
   nock NOTIFICATIONS_URL
-    .post "/jobs/#{JOB_ID}/operations", (body) -> _.omit(body, "request").should.be.eql bodyExpected
+    .post "/jobs/#{JOB_ID}/operations", (body) -> _.omit(body, ["request", "error"]).should.be.eql bodyExpected
     .reply 200
 
 _notificationsApiGetJob = (response) ->

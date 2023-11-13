@@ -7,6 +7,7 @@ NOTIFICATIONS_API_JOBS_CACHE_TTL = parseInt(process.env.NOTIFICATIONS_API_JOBS_C
 NOTIFICATIONS_API_STOPPED_JOB_CACHE_TTL = parseInt(process.env.NOTIFICATIONS_API_STOPPED_JOB_CACHE_TTL) or 2
 NOTIFICATIONS_API_MASTER_TOKEN = process.env.NOTIFICATIONS_API_MASTER_TOKEN
 DEFAULT_NOTIFICATIONS_API_ASYNC_URL = process.env.DEFAULT_NOTIFICATIONS_API_ASYNC_URL || "https://apps.producteca.com/aws/notifications-api-async"
+DEFAULT_NOTIFICATIONS_API_URL = process.env.NOTIFICATIONS_API_URL || "https://apps.producteca.com/notifications-api/api"
 HOUR = 60 * 60
 
 #Para minimizar las requests a notifications-api, cachea unos segundos el estado del job
@@ -14,7 +15,7 @@ jobsCache = new NodeCache({ stdTTL: NOTIFICATIONS_API_JOBS_CACHE_TTL })
 #A nivel dominio, podria ser cache sin TTL porque un job stoppeado queda asi para siempre. Pero se pone TTL de 2h para que luego libere la memoria
 stoppedJobsCache = new NodeCache({ stdTTL: NOTIFICATIONS_API_STOPPED_JOB_CACHE_TTL * HOUR }); 
 class NotificationsApi
-  constructor: ({ @notificationApiUrl, @token, @jobId, @notificationApiAsyncUrl = DEFAULT_NOTIFICATIONS_API_ASYNC_URL }) ->
+  constructor: ({ @notificationApiUrl = DEFAULT_NOTIFICATIONS_API_URL, @token, @jobId, @notificationApiAsyncUrl = DEFAULT_NOTIFICATIONS_API_ASYNC_URL }) ->
     if _.startsWith(@token, 'Basic') and !_.isEmpty NOTIFICATIONS_API_MASTER_TOKEN
       companyId = _.first(Buffer.from(_.get(@token.split(" "), "1"), 'base64').toString().split(":"))
       @token = "Basic #{new Buffer("#{companyId}:#{NOTIFICATIONS_API_MASTER_TOKEN}").toString("base64")}";
@@ -40,22 +41,29 @@ class NotificationsApi
     return Promise.resolve cachedStoppedJob if @_shouldUseCachedValue(cachedStoppedJob)
     @_jobIsStopped()
     .tap (jobIsStopped) => stoppedJobsCache.set(@jobId, jobIsStopped) if jobIsStopped
+
+  jobName: (jobId, token) => 
+    @_fetchJob(jobId, token)
+    .then (job) => job.name
   
-  _jobIsStopped: () => 
-    @_fetchJob()
+  _jobIsStopped: (jobId, token) => 
+    @_fetchJob(jobId, token)
     .then (job) => job.stopped
 
-  _fetchJob: () => 
-    cachedJob = jobsCache.get @jobId
+  fetchJob: (aJobId, aToken) => @_fetchJob(aJobId, aToken)
+  
+  _fetchJob: (aJobId, aToken) => 
+    jobId = aJobId or @jobId
+    cachedJob = jobsCache.get jobId
     return Promise.resolve cachedJob if @_shouldUseCachedValue(cachedJob)
-    @_doFetchJob()
-    .tap (job) => jobsCache.set @jobId, job
+    @_doFetchJob(jobId, aToken)
+    .tap (job) => jobsCache.set jobId, job
 
-  _doFetchJob: () => 
+  _doFetchJob: (jobId, token) => 
     __fetchJob = () => requestPromise({
-      url: "#{ @notificationApiUrl }/jobs/#{ @jobId }"
+      url: "#{ @notificationApiUrl }/jobs/#{ jobId or @jobId }"
       method: "GET"
-      headers: { authorization: @token }
+      headers: { authorization: token or @token }
       json: true
     }).promise()
 

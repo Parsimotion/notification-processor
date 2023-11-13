@@ -1,14 +1,20 @@
 request = require("request-promise");
-
-OAUTH_API_URL = process.env.OAUTH_API_URL or "https://apps.producteca.com/oauth"
+Promise = require("bluebird")
+NodeCache = require("node-cache")
+translatedCache = new NodeCache { stdTTL: 0, checkperiod: 0 }
+OAUTH_API_URL = process.env.OAUTH_API_URL or "https://apps.producteca.com/oauth" #TODO: Revisar que esta variable este seteada en todos lados con la interna, seguramente no
 
 module.exports = 
-class AuthApi
+class OAuthApi
   constructor: (@accessToken) ->
   
-  companyId: () => @_me().get("id")
+  scopes: () => 
+    cachedValue = translatedCache.get(@accessToken)
+    return Promise.resolve(cachedValue) if cachedValue
+    @_scopes()
+    .tap ({ id, companyId, appId }) => translatedCache.set(@accessToken, { id, companyId, appId })
   
-  _me: () => @_doRequest("get", "/users/me", { access_token: @accessToken })
+  _scopes: () => @_doRequest("get", "/scopes", { access_token: @accessToken, fromNotificationProcessor: true })
   
   
   _doRequest: (verb, path, qs = {}) => 

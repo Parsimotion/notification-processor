@@ -3,8 +3,8 @@ module.exports =
 
     constructor: ({ @processor, @maxRetries = 3 }) ->
 
-    process: (notification, context) ->
-      @processor notification, context
+    process: (notification, context, executionId) ->
+      @processor notification, context, executionId
       .tap (it) => @_onSuccess_ notification, it 
       .catch (err) =>
         throw @_sanitizeError_ err if @_shouldRetry_ notification, err
