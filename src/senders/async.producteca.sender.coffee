@@ -1,8 +1,11 @@
 _ = require("lodash")
 OAuthApi = require("../services/oAuthApi")
+NotificationsApi = require("../processors/job/notification.api")
 Promise = require("bluebird")
 retry = require("bluebird-retry")
 uuid = require("uuid/v4")
+
+notificationsApi = new NotificationsApi { }
 
 _companyIdFromBasicToken = (token) =>
   decoded = Buffer.from(token, "base64").toString()
@@ -27,20 +30,27 @@ module.exports =
     if _.isFunction resourceGetter then resourceGetter message else _.get message, "Resource"
   
   monitoringCenterFields: (notification) ->
+    fullToken = _headerValue(notification.message.HeadersForRequest, "Authorization", "")
+    [method, token] = fullToken.split(" ")
     __scopes = () =>
-      [method, token] = _headerValue(notification.message.HeadersForRequest, "Authorization", "").split(" ")
       return retry(() => new OAuthApi(token).scopes()) if _(method.toLowerCase()).includes("bearer")
       Promise.resolve { id: null, appId: null, companyId: _companyIdFromBasicToken(token) }
 
-    __scopes()
-    .then ({ id, companyId, appId }) =>
-      eventId = _headerValue(notification.message.HeadersForRequest, "job", null) or _headerValue(notification.message.HeadersForRequest, "Job", null) or _headerValue(notification.message.HeadersForRequest, "x-producteca-event-id", null) or _headerValue(notification.message.HeadersForRequest, "X-producteca-event-id", null) or notification?.meta?.messageId or uuid()
+    __jobName = () => notificationsApi.jobName(notification.message.JobId, fullToken).catchReturn() if notification.message.JobId and fullToken
+
+    Promise.props {
+      scopes: __scopes(),
+      jobName: __jobName(),
+    }
+    .then ({ scopes: { id, companyId, appId }, jobName }) =>
+      eventId = notification.message.JobId or _headerValue(notification.message.HeadersForRequest, "x-producteca-event-id", null) or _headerValue(notification.message.HeadersForRequest, "X-producteca-event-id", null) or notification?.meta?.messageId or uuid()
       Promise.props { 
         eventType: 'http'
         resource: @resource(notification)
         companyId: companyId
         userId: id
         app: parseInt appId
+        job: jobName
         externalReference: null
         eventId: eventId 
         eventTimestamp: new Date(notification?.meta?.insertionTime).getTime() if notification?.meta?.insertionTime #TODO: No es exactamente el timestamp del evento? es el de cuando llega a la cola de async...
