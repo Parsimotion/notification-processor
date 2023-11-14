@@ -12,8 +12,8 @@ module.exports =
       super args
       { @notificationApiUrl, @notificationApiAsyncUrl, @nonRetryable } = args
 
-    process: (notification) =>
-      @_ifJobIsNotStopped notification.message, () => super(notification).thenReturn()
+    process: (notification, context, executionId) =>
+      @_ifJobIsNotStopped notification.message, () => super(notification, context, executionId).thenReturn()
 
     _onSuccess_: ({ message }, { statusCode }) =>
       @_ifJobIsNotStopped message, () => @_notificationsApi(message).success { message, statusCode }

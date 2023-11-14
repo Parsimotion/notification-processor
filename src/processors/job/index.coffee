@@ -10,4 +10,4 @@ module.exports = ({ apiUrl, notificationApiUrl, maxRetries, nonRetryable = [400]
     notificationApiUrl
   }
 
-  (it) -> jobProcesor.process it
+  (it, context, executionId) -> jobProcesor.process it, context, executionId
