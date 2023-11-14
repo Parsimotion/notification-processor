@@ -18,8 +18,8 @@ module.exports =
       observable.on "started", (payload) => @uploadTrackingFile(payload, "pending")
       observable.on "successful", (payload) => @uploadTrackingFile(payload, "successful")
 
-    uploadTrackingFile: ({ id, notification, error }, eventType) =>
-      @_mapper id, notification, error, eventType
+    uploadTrackingFile: ({ id, notification, error }, executionStatus) =>
+      @_mapper id, notification, error, executionStatus
       .then (record) => 
         return if _.isEmpty(record)
 
@@ -33,7 +33,7 @@ module.exports =
         .tap () => debug "Uploaded file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
         .catch (e) => # We'll do nothing with this error
           debug "Error uploading file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e  
-    _mapper: (id, notification, err, eventType) ->
+    _mapper: (id, notification, err, executionStatus) ->
       Promise.method(@sender.monitoringCenterFields.bind(@sender))(notification)
       .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId, app, job }) => 
         return Promise.resolve({ }) if !eventId
@@ -43,7 +43,7 @@ module.exports =
           id
           executionId: id
           app: app or parseInt(@clientId) or null
-          type: eventType
+          type: eventType or "service-bus"
           company: companyId 
           user: userId
           event: eventId,
@@ -65,7 +65,7 @@ module.exports =
             type: err && _.get(err, "type", "unknown")
             tags: _.get err, "tags", []
           })
-          status: eventType
+          status: executionStatus
           resource
           integration: "#{@app}|#{job or @job}"
           # Generic app fields
