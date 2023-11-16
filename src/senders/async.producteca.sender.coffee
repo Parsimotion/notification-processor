@@ -65,5 +65,5 @@ module.exports =
         eventId: eventId 
         eventTimestamp: jobCreationDate or messageInsertionTime
         parentEventId: null
-        partialMessage: _.assign notification.message, { HeadersForRequest: headersWithoutAuth }
+        partialMessage: _.assign { }, notification.message, { HeadersForRequest: headersWithoutAuth }
       }
