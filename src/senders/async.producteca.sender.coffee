@@ -52,6 +52,8 @@ module.exports =
       eventId = notification.message.JobId or _headerValue(notification.message.HeadersForRequest, "x-producteca-event-id", null) or _headerValue(notification.message.HeadersForRequest, "X-producteca-event-id", null) or notification?.meta?.messageId or uuid()
       jobCreationDate = new Date(creationDate).getTime() if creationDate
       messageInsertionTime = new Date(notification?.meta?.insertionTime).getTime() if notification?.meta?.insertionTime 
+      headersWithoutAuth = _.reject notification.message.HeadersForRequest, ({ Key }) => Key?.toLowerCase() is 'authorization'
+
       Promise.props { 
         eventType: 'http'
         resource: @resource(notification)
@@ -63,4 +65,5 @@ module.exports =
         eventId: eventId 
         eventTimestamp: jobCreationDate or messageInsertionTime
         parentEventId: null
+        partialMessage: _.assign { }, notification.message, { HeadersForRequest: headersWithoutAuth }
       }
