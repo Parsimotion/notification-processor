@@ -38,6 +38,14 @@ module.exports =
       .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId, app, job, partialMessage }) => 
         return Promise.resolve({ }) if !eventId
         theRequest = _.get(err, "detail.request") || _.get(err, "cause.detail.request")
+
+        errorDescription = 
+          err and 
+            _(["cause.message", "message", "cause.type"])
+            .map (property) => _.get err, property
+            .reject _.isEmpty
+            .get 0, "unknown"
+        
         now = new Date()
         {
           id
@@ -62,7 +70,7 @@ module.exports =
             @app
             error: _.omit(err, ["detail.request", "cause.detail.request"])
             request: _.omit(theRequest, _.castArray(@propertiesToOmit).concat("auth"))
-            type: err && _.get(err, "type", "unknown")
+            type: errorDescription
             tags: _.get err, "tags", []
             message: partialMessage or notification.message
           })
@@ -71,7 +79,7 @@ module.exports =
           integration: "#{@app}|#{job or @job}"
           # Generic app fields
           event_timestamp: eventTimestamp or now.getTime()
-          output_message: _.get(err, "type")
+          output_message: errorDescription
           user_settings_version: null #TODO
           env_version: null #TODO
           code_version: null #TODO
