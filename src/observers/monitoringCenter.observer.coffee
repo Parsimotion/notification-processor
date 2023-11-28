@@ -41,7 +41,7 @@ module.exports =
 
         errorDescription = 
           err and 
-            _(["cause.message", "message", "cause.type"])
+            _(["cause.message", "message", "cause.type", "type"])
             .map (property) => _.get err, property
             .reject _.isEmpty
             .get 0, "unknown"
