@@ -39,7 +39,7 @@ module.exports =
         return Promise.resolve({ }) if !eventId
         theRequest = _.get(err, "detail.request") || _.get(err, "cause.detail.request")
 
-        errorDescription = 
+        errorType = 
           err and 
             _(["cause.message", "message", "cause.type", "type"])
             .map (property) => _.get err, property
@@ -70,7 +70,6 @@ module.exports =
             @app
             error: _.omit(err, ["detail.request", "cause.detail.request"])
             request: _.omit(theRequest, _.castArray(@propertiesToOmit).concat("auth"))
-            type: errorDescription
             tags: _.get err, "tags", []
             message: partialMessage or notification.message
           })
@@ -79,7 +78,7 @@ module.exports =
           integration: "#{@app}|#{job or @job}"
           # Generic app fields
           event_timestamp: eventTimestamp or now.getTime()
-          output_message: errorDescription
+          error_type: errorType
           user_settings_version: null #TODO
           env_version: null #TODO
           code_version: null #TODO
