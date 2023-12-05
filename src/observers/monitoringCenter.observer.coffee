@@ -33,18 +33,15 @@ module.exports =
         .tap () => debug "Uploaded file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
         .catch (e) => # We'll do nothing with this error
           debug "Error uploading file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e  
+    
     _mapper: (id, notification, err, executionStatus) ->
       Promise.method(@sender.monitoringCenterFields.bind(@sender))(notification)
       .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId, app, job, partialMessage }) => 
         return Promise.resolve({ }) if !eventId
-        theRequest = _.get(err, "detail.request") || _.get(err, "cause.detail.request")
+        theRequest = _.get(err, "detail.request") or _.get(err, "cause.detail.request")
 
-        errorType = 
-          err and 
-            _(["cause.message", "message", "cause.type", "type"])
-            .map (property) => _.get err, property
-            .reject _.isEmpty
-            .get 0, "unknown"
+        errorType = @_retrieveMessageFromError err, ["cause.type", "type"], "unknown"
+        errorMessage = @_retrieveMessageFromError err, ["cause.message", "message"], ""
         
         now = new Date()
         {
@@ -84,4 +81,8 @@ module.exports =
           code_version: null #TODO
         }
 
+    _retrieveMessageFromError: (err, properties, defaultValue) -> 
+      err and _(properties).map (property) => _.get err, property
+        .reject _.isEmpty
+        .get 0, defaultValue
 
