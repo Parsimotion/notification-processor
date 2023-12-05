@@ -76,6 +76,7 @@ module.exports =
           # Generic app fields
           event_timestamp: eventTimestamp or now.getTime()
           error_type: errorType
+          output_message: errorMessage
           user_settings_version: null #TODO
           env_version: null #TODO
           code_version: null #TODO
