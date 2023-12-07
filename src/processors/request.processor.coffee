@@ -1,5 +1,6 @@
 _ = require "lodash"
 NonRetryableError = require "../exceptions/non.retryable"
+IgnoredError = require "../exceptions/ignored.error"
 Promise = require "bluebird";
 request = require "request-promise"
 { StatusCodeError, RequestError } = require "request-promise/errors"
@@ -47,5 +48,5 @@ module.exports = (requestGenerator, { silentErrors = [], nonRetryable = [] } = {
         tags: safeError?.tags
       }
     .tapCatch (err) -> _.defaultsDeep err, { type: "unknown", message: "unknown", detail: { request: options } }
-    .catch __isIncludedInStatusesError(silentErrors), (err) -> err
+    .catch __isIncludedInStatusesError(silentErrors), (err) -> throw new IgnoredError "An error has ocurred in that request but should be ignored", _.omit(err, "response")
     .catch __isIncludedInStatusesError(nonRetryable), (err) -> throw new NonRetryableError "An error has ocurred in that request", _.omit(err, "response")

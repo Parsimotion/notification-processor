@@ -1,5 +1,6 @@
 _ = require "lodash"
 NonRetryable = require "./exceptions/non.retryable"
+IgnoredError = require "./exceptions/ignored.error"
 EventEmitter = require "events"
 Promise = require "bluebird"
 uuid = require "uuid/v4"
@@ -29,6 +30,8 @@ module.exports =
 
       execute()
       .tap => @_emitEvent "successful", { context, id, notification }
+      .catch IgnoredError, (error) =>
+        @_emitEvent "successful", { context, id, notification, warnings: [error] }
       .catch (error) =>
         throw error unless error instanceof NonRetryable
         @_emitEvent "unsuccessful_non_retryable", { context, id, notification, error }
