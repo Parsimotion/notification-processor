@@ -5,6 +5,9 @@ debug = require("debug") "notification-processor:observers:monitor-center"
 AWS = require "aws-sdk"
 moment = require "moment"
 
+TYPE_PROPERTIES = ["cause.type", "type"]
+MESSAGE_PROPERTIES = ["cause.message", "message"]
+
 module.exports = 
   class MonitoringCenterObserver
 
@@ -18,8 +21,9 @@ module.exports =
       observable.on "started", (payload) => @uploadTrackingFile(payload, "pending")
       observable.on "successful", (payload) => @uploadTrackingFile(payload, "successful")
 
-    uploadTrackingFile: ({ id, notification, error }, executionStatus) =>
-      @_mapper id, notification, error, executionStatus
+    uploadTrackingFile: (payload, executionStatus) =>
+      @_mapper _.merge({ executionStatus }, payload)
+      .tap (record) => debug "Record to save in firehose %j", record
       .then (record) => 
         return if _.isEmpty(record)
 
@@ -34,14 +38,14 @@ module.exports =
         .catch (e) => # We'll do nothing with this error
           debug "Error uploading file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e  
     
-    _mapper: (id, notification, err, executionStatus) ->
+    _mapper: ({ id, notification, error, warnings, executionStatus }) ->
       Promise.method(@sender.monitoringCenterFields.bind(@sender))(notification)
       .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId, app, job, partialMessage }) => 
         return Promise.resolve({ }) if !eventId
-        theRequest = _.get(err, "detail.request") or _.get(err, "cause.detail.request")
+        theRequest = _.get(error, "detail.request") or _.get(error, "cause.detail.request")
 
-        errorType = @_retrieveMessageFromError err, ["cause.type", "type"], "unknown"
-        errorMessage = @_retrieveMessageFromError err, ["cause.message", "message"], ""
+        errorType = @_retrieveMessageFromError error, TYPE_PROPERTIES, "unknown"
+        errorMessage = @_retrieveMessageFromError error, MESSAGE_PROPERTIES, ""
         
         now = new Date()
         {
@@ -65,9 +69,9 @@ module.exports =
             @clientId
             @job
             @app
-            error: _.omit(err, ["detail.request", "cause.detail.request"])
+            error: _.omit(error, ["detail.request", "cause.detail.request"])
             request: _.omit(theRequest, _.castArray(@propertiesToOmit).concat("auth"))
-            tags: _.get err, "tags", []
+            tags: _.get error, "tags", []
             message: partialMessage or notification.message
           })
           status: executionStatus
@@ -80,10 +84,15 @@ module.exports =
           user_settings_version: null #TODO
           env_version: null #TODO
           code_version: null #TODO
+          warnings: warnings?.map (warning) => 
+            {
+              type: @_retrieveMessageFromError warning, TYPE_PROPERTIES, "unknown"
+              message: @_retrieveMessageFromError warning, MESSAGE_PROPERTIES, ""
+            }
         }
 
-    _retrieveMessageFromError: (err, properties, defaultValue) -> 
-      err and _(properties).map (property) => _.get err, property
+    _retrieveMessageFromError: (error, properties, defaultValue) -> 
+      error and _(properties).map (property) => _.get error, property
         .reject _.isEmpty
         .get 0, defaultValue
 
