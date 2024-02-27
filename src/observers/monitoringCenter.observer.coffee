@@ -16,14 +16,14 @@ module.exports =
       @uploadToFirehose = Promise.promisify(@firehose.putRecord).bind(@firehose)
     
     listenTo: (observable) ->
-      observable.on "unsuccessful_non_retryable", (payload) => @uploadTrackingFile(payload, "unsuccessful_non_retryable")
-      observable.on "unsuccessful", (payload) => @uploadTrackingFile(payload, "unsuccessful")
-      observable.on "started", (payload) => @uploadTrackingFile(payload, "pending")
-      observable.on "successful", (payload) => @uploadTrackingFile(payload, "successful")
+      observable.on "unsuccessful_non_retryable", (payload) => @registerRecord(payload, "unsuccessful")
+      observable.on "unsuccessful", (payload) => @registerRecord(payload, "unsuccessful")
+      observable.on "started", (payload) => @registerRecord(payload, "pending")
+      observable.on "successful", (payload) => @registerRecord(payload, "successful")
 
-    uploadTrackingFile: (payload, executionStatus) =>
+    registerRecord: (payload, executionStatus) =>
       @_mapper _.merge({ executionStatus }, payload)
-      .tap (record) => debug "Record to save in firehose %j", record
+      .tap (record) => debug "Record to save in firehose %s %j", @deliveryStream, record
       .then (record) => 
         return if _.isEmpty(record)
 
@@ -31,12 +31,12 @@ module.exports =
           DeliveryStreamName: @deliveryStream, 
           Record: Data: JSON.stringify(record)
         }
-        debug "Uploading file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
+        debug "Uploading record #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
         __uploadToFirehose = () => @uploadToFirehose uploadParams
         retry __uploadToFirehose, { throw_original: true }
-        .tap () => debug "Uploaded file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
+        .tap () => debug "Uploaded record #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
         .catch (e) => # We'll do nothing with this error
-          debug "Error uploading file #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e  
+          debug "Error uploading record #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e
     
     _mapper: ({ id, notification, error, warnings, executionStatus }) ->
       Promise.method(@sender.monitoringCenterFields.bind(@sender))(notification)
