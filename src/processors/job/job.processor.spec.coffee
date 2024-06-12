@@ -1,4 +1,5 @@
 NonRetryable = require("../../exceptions/non.retryable")
+IgnoredError = require("../../exceptions/ignored.error")
 
 NOTIFICATIONS_URL = "http://unhost/notifications/api"
 API_URL = "http://unhost/api"
@@ -64,6 +65,15 @@ describe "JobProcessor", ->
       .tap -> nock.isDone().should.be.ok()
       .should.be.rejectedWith NonRetryable
 
+    it "equal to 410 then should ignore error", ->
+      @timeout 10000
+      _notificationsApiGetJob()
+      mockFailedNotificationWith 410
+
+      _processJob()
+      .tap -> nock.isDone().should.be.ok()
+      .should.be.rejectedWith IgnoredError
+
   context "when API response with good status code", ->
     it "and dequeue counter is lower than MAX_DEQUEUE_COUNT, should notify for success to notificationsApi", ->
       _nockAPI()
@@ -107,7 +117,7 @@ message =
 _createJobNotification = (meta) -> { message, meta }
 
 _processJob = (meta = { dequeueCount: 1 }) ->
-  processor = JobProcessor { apiUrl: API_URL, notificationApiUrl: NOTIFICATIONS_URL }
+  processor = JobProcessor { apiUrl: API_URL, notificationApiUrl: NOTIFICATIONS_URL, silentErrors: [410] }
   processor _createJobNotification meta
 
 _nockAPI = (statusCode = 200, errorMessage = "") ->
