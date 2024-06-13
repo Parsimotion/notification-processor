@@ -10,7 +10,7 @@ module.exports =
 
     constructor: (args) ->
       super args
-      { @notificationApiUrl, @notificationApiAsyncUrl, @nonRetryable } = args
+      { @notificationApiUrl, @notificationApiAsyncUrl, @nonRetryable, @silentErrors } = args
 
     process: (notification, context, executionId) =>
       @_ifJobIsNotStopped notification.message, () => super(notification, context, executionId).thenReturn()

@@ -7,6 +7,7 @@ Promise = require "bluebird"
 
 RequestProcessor = require "./request.processor"
 NonRetryable = require "../exceptions/non.retryable"
+IgnoredError = require "../exceptions/ignored.error"
 
 DOMAIN = "http://miApi.com.foo"
 PATH = "/api/availableQuantity/123"
@@ -24,7 +25,7 @@ describe "RequestProcessor", ->
   after ->
     nock.enableNetConnect()
 
-  it "should do a POST request and its should be successful", ->
+  it "should do a POST request and it should be successful", ->
     nockDomain = nockStub().reply 200, {}
     spy = sinon.spy RequestProcessor req
 
@@ -33,7 +34,7 @@ describe "RequestProcessor", ->
     .tap -> nockDomain.done()
     .tap -> spy.should.be.calledWith MESSAGE
 
-  it "should do a POST request and its should be unsuccessful", ->
+  it "should do a POST request and it should be unsuccessful", ->
     nockDomain = nockStub().reply 503, {}
     spy = sinon.spy RequestProcessor req
 
@@ -42,16 +43,16 @@ describe "RequestProcessor", ->
     .tap -> nockDomain.done()
     .tap -> spy.should.be.calledWith MESSAGE
 
-  it "should do a POST request and its should be ignored if is a silent errors", ->
+  it "should do a POST request and it should be ignored if it is a silent error", ->
     nockDomain = nockStub().reply 409, {}
     spy = sinon.spy RequestProcessor req, { silentErrors: [ 409 ] }
 
     spy MESSAGE
-    .should.be.fulfilled()
+    .should.be.rejectedWith IgnoredError
     .tap -> nockDomain.done()
     .tap -> spy.should.be.calledWith MESSAGE
 
-  it "should do a POST request and its should be ignored if is a silent errors", ->
+  it "should do a POST request and it should be ignored if it is a silent error", ->
     nockDomain = nockStub().reply 400, {}
     spy = sinon.spy RequestProcessor req, { nonRetryable: [ 400 ] }
 
@@ -60,7 +61,7 @@ describe "RequestProcessor", ->
     .tap -> nockDomain.done()
     .tap -> spy.should.be.calledWith MESSAGE
 
-  it "should do a POST request and its should be ignored if is a silent errors", ->
+  it "should do a POST request and it should be ignored if it is a silent error", ->
     nockDomain = nockStub().reply 400, {}
     spy = sinon.spy RequestProcessor req, { nonRetryable: ['client'] }
 
@@ -69,7 +70,7 @@ describe "RequestProcessor", ->
     .tap -> nockDomain.done()
     .tap -> spy.should.be.calledWith MESSAGE
 
-  it "should do a POST request event if is called with a promise and it should be successful", ->
+  it "should do a POST request event if it is called with a promise and it should be successful", ->
     nockDomain = nockStub().reply 200, {}
     spy = sinon.spy => Promise.resolve req()
 

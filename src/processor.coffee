@@ -28,9 +28,11 @@ module.exports =
           $promise
           .tapCatch (err) -> newrelic().noticeError new Error(JSON.stringify(_.omit(err.detail, "request.auth.pass")))
 
+      _isIgnoredError = (error) => error instanceof IgnoredError
+
       execute()
       .tap => @_emitEvent "successful", { context, id, notification }
-      .catch IgnoredError, (error) =>
+      .catch _isIgnoredError, (error) =>
         @_emitEvent "successful", { context, id, notification, warnings: [error] }
       .catch (error) =>
         throw error unless error instanceof NonRetryable
