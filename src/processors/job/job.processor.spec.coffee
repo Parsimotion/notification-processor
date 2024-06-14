@@ -22,6 +22,13 @@ mockFailedNotificationWith = (badStatusCode) ->
   _nockAPI badStatusCode, errorMessage
   _notificationsApiNock bodyExpected
 
+mockSuccessfulNotification = (statusCode) ->
+  bodyExpected =
+    success: yes
+
+  _nockAPI statusCode
+  _notificationsApiNock bodyExpected
+
 
 _notificationsApiNock = (bodyExpected) ->
   nock NOTIFICATIONS_URL
@@ -68,7 +75,7 @@ describe "JobProcessor", ->
     it "equal to 410 then should ignore error", ->
       @timeout 10000
       _notificationsApiGetJob()
-      mockFailedNotificationWith 410
+      mockSuccessfulNotification 410
 
       _processJob()
       .tap -> nock.isDone().should.be.ok()

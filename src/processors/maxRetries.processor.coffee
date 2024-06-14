@@ -1,3 +1,4 @@
+Promise = require "bluebird"
 IgnoredError = require "../exceptions/ignored.error"
 
 module.exports =
@@ -19,5 +20,7 @@ module.exports =
     _onSuccess_: (notification, result) -> throw new Error "subclass responsability"
     _sanitizeError_: (err) -> throw new Error "subclass responsability"
     _onMaxRetryExceeded_: (notification, err) -> throw new Error "subclass responsability"
-    _onIgnoredError_: (notification, err) -> throw err
+    _onIgnoredError_: (notification, err) =>
+      Promise.try => @_onSuccess_ notification, err
+        .tap -> throw err
     _isIgnoredError_: (err) -> err instanceof IgnoredError
