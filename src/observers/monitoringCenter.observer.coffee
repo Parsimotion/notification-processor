@@ -46,6 +46,8 @@ module.exports =
 
         errorType = @_retrieveMessageFromError error, TYPE_PROPERTIES, "unknown"
         errorMessage = @_retrieveMessageFromError error, MESSAGE_PROPERTIES, ""
+
+        errorType = "timed_out" if /the operation did not complete within the allocated time/gi.test(errorType)
         
         now = new Date()
         {
