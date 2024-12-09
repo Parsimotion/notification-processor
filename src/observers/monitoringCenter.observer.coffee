@@ -22,10 +22,10 @@ module.exports =
       observable.on "successful", (payload) => @registerRecord(payload, "successful")
 
     registerRecord: (payload, executionStatus) =>
-      jodId = _.get(payload, 'notification.message.JobId');
-      deliveryStreamName = if jodId then @jobsDeliveryStream else @deliveryStream
+      jobId = _.get(payload, 'notification.message.JobId');
+      deliveryStreamName = if jobId then @jobsDeliveryStream else @deliveryStream
 
-      @_mapper _.merge({ executionStatus, jodId }, payload)
+      @_mapper _.merge({ executionStatus, jobId }, payload)
       .tap (record) => debug "Record to save in firehose %s %j", deliveryStreamName, record
       .then (record) => 
         return if _.isEmpty(record)
@@ -41,7 +41,7 @@ module.exports =
         .catch (e) => # We'll do nothing with this error
           debug "Error uploading record #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName} %o", e
     
-    _mapper: ({ id, notification, error, warnings, executionStatus, jodId }) ->
+    _mapper: ({ id, notification, error, warnings, executionStatus, jobId }) ->
       Promise.method(@sender.monitoringCenterFields.bind(@sender))(notification)
       .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId, app, job, partialMessage }) => 
         return Promise.resolve({ }) if !eventId
@@ -57,7 +57,7 @@ module.exports =
 
         executionRegister = { eventType, userId, eventId, parentEventId, externalReference, userExternalReference, error, theRequest, partialMessage, notification, resource, eventTimestamp, warnings }
 
-        return if jodId then @_registerJob(basicRegister, jodId) else @_registerExecution(basicRegister, executionRegister)
+        return if jobId then @_registerJob(basicRegister, jobId) else @_registerExecution(basicRegister, executionRegister)
       
     _registerJob: (basicRegister, jobId) =>
       {
