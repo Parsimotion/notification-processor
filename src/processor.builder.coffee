@@ -1,7 +1,7 @@
 _ = require "lodash"
 Processor = require "./processor"
 logger = require "./observers/logger.observer"
-{ UnknownSource, ServiceBusSource, QueueSource } = require "./sources"
+{ UnknownSource, ServiceBusSource, QueueSource, AwsSQSSource } = require "./sources"
 { MeliSender, ProductecaSender } = require "./senders"
 
 class ProcessorBuilder
@@ -32,6 +32,8 @@ class ProcessorBuilder
     @withListeners @source.didLastRetry _.defaults(opts, { @sender })
 
   fromServiceBus: -> @withSource ServiceBusSource
+
+  fromAwsSQS: -> @withSource AwsSQSSource
 
   fromQueue: -> @withSource QueueSource
 
