@@ -20,17 +20,6 @@ class ProcessorBuilder
 
   withApm: (@apm) -> @
 
-  withDelayObserver: (opts) ->
-    @withListeners @source.delayObserver opts
-
-  withDeadLetterSucceeded: (opts) ->
-    throw new Error "Sender is required" unless @sender?
-    @withListeners @source.deadLetterSucceeded _.defaults(opts, { @sender })
-
-  withDidLastRetry: (opts) ->
-    throw new Error "Sender is required" unless @sender?
-    @withListeners @source.didLastRetry _.defaults(opts, { @sender })
-
   fromServiceBus: -> @withSource ServiceBusSource
 
   fromAwsSQS: -> @withSource AwsSQSSource
