@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "grunt test",
-    "build": "grunt build",
-    "prepublishOnly": "grunt build"
+    "build": "grunt build"
   },
   "repository": {
     "type": "git",
