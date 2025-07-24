@@ -1,7 +1,7 @@
 _ = require "lodash"
 
 module.exports = 
-  newNotification: ({ message }) ->
+  newNotification: ({ context, message }) ->
     message: if(!_.isObject(message.Message)) then JSON.parse(message.Message) else message.Message
     meta: {
       insertionTime: _.get(message, "Timestamp"),
@@ -13,5 +13,6 @@ module.exports =
           Number(Value)
         else
           Value
+      dequeueCount: _.get(context, "bindingData.approximateReceiveCount")
     }
     type: "sqs"
