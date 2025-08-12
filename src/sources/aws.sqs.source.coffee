@@ -15,4 +15,4 @@ module.exports =
           Value
       dequeueCount: _.get(context, "bindingData.approximateReceiveCount")
     }
-    type: "sqs"
+    type: "sb"
