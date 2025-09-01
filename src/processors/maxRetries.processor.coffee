@@ -7,6 +7,8 @@ module.exports =
     constructor: ({ @processor, @maxRetries = 3 }) ->
 
     process: (notification, context, executionId) ->
+      console.log("NOTIFICATION", notification)
+      console.log("CONTEXT", context)
       @processor notification, context, executionId
       .tap (it) => @_onSuccess_ notification, it 
       .catch (err) =>
@@ -15,6 +17,7 @@ module.exports =
         @_onMaxRetryExceeded_ notification, err
 
     _shouldRetry_: ({ meta: { dequeueCount = 0 } }, err) ->
+      console.log("dequeueCount: #{dequeueCount}, maxRetries: #{@maxRetries}")
       dequeueCount < @maxRetries
 
     _onSuccess_: (notification, result) -> throw new Error "subclass responsability"
