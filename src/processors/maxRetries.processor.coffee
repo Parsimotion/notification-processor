@@ -3,7 +3,7 @@ IgnoredError = require "../exceptions/ignored.error"
 
 module.exports =
   class MaxRetriesProcessor
-    constructor: ({ @processor, @maxRetries = 3, processorTimeout = 60 }) ->
+    constructor: ({ @processor, @maxRetries = 3, @processorTimeout = 60 }) ->
       process: (notification, context, executionId) ->
         Promise.resolve(@processor notification, context, executionId)
           .timeout(@processorTimeout*1000)
