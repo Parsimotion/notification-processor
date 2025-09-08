@@ -1,3 +1,10 @@
+# [5.2.0](https://github.com/Parsimotion/notification-processor/compare/v5.1.0...v5.2.0) (2025-09-08)
+
+
+### Features
+
+* genero minor ([5dd8a1b](https://github.com/Parsimotion/notification-processor/commit/5dd8a1b030f6d9577cfc879181963c94ac14dc2e))
+
 # [5.1.0](https://github.com/Parsimotion/notification-processor/compare/v5.0.3...v5.1.0) (2025-09-08)
 
 
