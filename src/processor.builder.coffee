@@ -1,7 +1,7 @@
 _ = require "lodash"
 Processor = require "./processor"
 logger = require "./observers/logger.observer"
-{ UnknownSource, ServiceBusSource, QueueSource, AwsSQSSource, AwsSNSSource } = require "./sources"
+{ UnknownSource, ServiceBusSource, QueueSource, AwsSQSSource } = require "./sources"
 { MeliSender, ProductecaSender } = require "./senders"
 
 class ProcessorBuilder
@@ -21,8 +21,6 @@ class ProcessorBuilder
   withApm: (@apm) -> @
 
   fromServiceBus: -> @withSource ServiceBusSource
-
-  fromAwsSNS: -> @withSource AwsSNSSource
 
   fromAwsSQS: -> @withSource AwsSQSSource
 
