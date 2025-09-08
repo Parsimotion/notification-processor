@@ -1,3 +1,11 @@
+# [5.1.0](https://github.com/Parsimotion/notification-processor/compare/v5.0.3...v5.1.0) (2025-09-08)
+
+
+### Features
+
+* agrego @ ([45d5ba1](https://github.com/Parsimotion/notification-processor/commit/45d5ba148a55a3d58655ac55daae48c08a9c6ff8))
+* agrego timeout para processor en maxretries ([8588bb6](https://github.com/Parsimotion/notification-processor/commit/8588bb60e1adec72a9447f838700ef0535d1daf2))
+
 ## [5.0.3](https://github.com/Parsimotion/notification-processor/compare/v5.0.2...v5.0.3) (2025-07-24)
 
 
