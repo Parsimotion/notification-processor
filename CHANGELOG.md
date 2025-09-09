@@ -1,3 +1,19 @@
+# [6.0.0](https://github.com/Parsimotion/notification-processor/compare/v5.2.0...v6.0.0) (2025-09-09)
+
+
+* feat!: saco timeout no necesario ([de23ca3](https://github.com/Parsimotion/notification-processor/commit/de23ca32091fcf59944ec6ed5f7a49fa1b8ba981))
+
+
+### Features
+
+* genero major ([b6d5741](https://github.com/Parsimotion/notification-processor/commit/b6d5741e4dc9428376f464527ebe1b3a2f5df75c))
+* genero major 2do intento ([ad19f88](https://github.com/Parsimotion/notification-processor/commit/ad19f88dfcaf4af2571af4d477bec7489121fa2f))
+
+
+### BREAKING CHANGES
+
+*
+
 # [5.2.0](https://github.com/Parsimotion/notification-processor/compare/v5.1.0...v5.2.0) (2025-09-08)
 
 
