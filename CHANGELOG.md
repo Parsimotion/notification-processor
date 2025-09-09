@@ -1,3 +1,10 @@
+## [6.0.1](https://github.com/Parsimotion/notification-processor/compare/v6.0.0...v6.0.1) (2025-09-09)
+
+
+### Bug Fixes
+
+* publish workflow ([b1b1f87](https://github.com/Parsimotion/notification-processor/commit/b1b1f87cfe674fc521d63fb71c33ba0b27469862))
+
 # [6.0.0](https://github.com/Parsimotion/notification-processor/compare/v5.2.0...v6.0.0) (2025-09-09)
 
 
