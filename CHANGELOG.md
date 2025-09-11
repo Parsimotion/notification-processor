@@ -1,3 +1,10 @@
+## [6.0.2](https://github.com/Parsimotion/notification-processor/compare/v6.0.1...v6.0.2) (2025-09-11)
+
+
+### Bug Fixes
+
+* enter en max retry ([2c08986](https://github.com/Parsimotion/notification-processor/commit/2c089862dff18a8b146b01a9e18f0eb13519dd1c))
+
 ## [6.0.1](https://github.com/Parsimotion/notification-processor/compare/v6.0.0...v6.0.1) (2025-09-09)
 
 
