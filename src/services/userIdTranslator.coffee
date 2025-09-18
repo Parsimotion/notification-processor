@@ -28,7 +28,16 @@ module.exports = class UserIdTranslator
 
     _translateUserId: (userId) =>
         console.log("Making request to translate", userId)
-        retry () => request.get({
+        retry((() => @_fetchUser(userId)), { max_tries: 3, throw_original: true, predicate: (err) => err.statusCode != 401 })
+        .then (userInformation) => { app: userInformation.app, companyId: userInformation.tenantId or userInformation.companyId }
+        .tap ({ companyId }) => console.log("UserId translated %s ==> %s", userId, companyId)
+        .catch (reason) =>
+            return "Unknown" if _.includes([ 401, 500 ], reason.statusCode)
+            throw reason
+        .tap (companyId) => @_setInCache(userId, companyId)
+    
+    _fetchUser: (userId) =>
+        request.get({
             url: "#{MERCADOLIBRE_API_CORE_URL}/users/me",
             json: true,
             qs: { authenticationType: "mercadolibre" },
@@ -37,9 +46,4 @@ module.exports = class UserIdTranslator
                 password: MERCADOLIBRE_API_MASTER_TOKEN
             }
         }).promise()
-        .then (userInformation) => { app: userInformation.app, companyId: userInformation.tenantId or userInformation.companyId }
-        .tap ({ companyId }) => console.log("UserId translated %s ==> %s", userId, companyId)
-        .catch (reason) =>
-            return "Unknown" if _.includes([ 401, 500 ], reason.statusCode)
-            throw reason
-        .tap (companyId) => @_setInCache(userId, companyId)
+
