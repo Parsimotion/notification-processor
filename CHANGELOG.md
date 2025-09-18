@@ -1,3 +1,10 @@
+## [6.0.3](https://github.com/Parsimotion/notification-processor/compare/v6.0.2...v6.0.3) (2025-09-18)
+
+
+### Bug Fixes
+
+* avoid retry on 401 ([f4e027f](https://github.com/Parsimotion/notification-processor/commit/f4e027f78be81d242d9b53860b2d67304636983f))
+
 ## [6.0.2](https://github.com/Parsimotion/notification-processor/compare/v6.0.1...v6.0.2) (2025-09-11)
 
 
