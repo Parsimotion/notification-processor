@@ -18,7 +18,7 @@ class NotificationsApi
   constructor: ({ @notificationApiUrl = DEFAULT_NOTIFICATIONS_API_URL, @token, @jobId, @notificationApiAsyncUrl = DEFAULT_NOTIFICATIONS_API_ASYNC_URL }) ->
     if _.startsWith(@token, 'Basic') and !_.isEmpty NOTIFICATIONS_API_MASTER_TOKEN
       companyId = _.first(Buffer.from(_.get(@token.split(" "), "1"), 'base64').toString().split(":"))
-      @token = "Basic #{new Buffer("#{companyId}:#{NOTIFICATIONS_API_MASTER_TOKEN}").toString("base64")}";
+      @token = "NO_HARDCODED_SECRET_HERE"#{companyId}:#{NOTIFICATIONS_API_MASTER_TOKEN}").toString("base64")}";
 
   success: (response, options) => 
     { statusCode } = response;
