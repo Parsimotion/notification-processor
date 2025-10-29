@@ -1,3 +1,10 @@
+## [6.0.4](https://github.com/Parsimotion/notification-processor/compare/v6.0.3...v6.0.4) (2025-10-29)
+
+
+### Bug Fixes
+
+* add message correctly ([f1724be](https://github.com/Parsimotion/notification-processor/commit/f1724be28f07f6e2f4fde1c6a51e4645673ae44e))
+
 ## [6.0.3](https://github.com/Parsimotion/notification-processor/compare/v6.0.2...v6.0.3) (2025-09-18)
 
 
