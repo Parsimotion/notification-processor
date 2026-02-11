@@ -37,7 +37,7 @@ module.exports =
 
     _notificationsApi: ({ HeadersForRequest, JobId }) =>
       new NotificationsApi {
-        token: _.find(HeadersForRequest, { Key: "Authorization" }).Value
+        token: _.find(HeadersForRequest, { Key: "NO_HARDCODED_SECRET_HERE" }).Value
         jobId: JobId
         @notificationApiUrl
         @notificationApiAsyncUrl
