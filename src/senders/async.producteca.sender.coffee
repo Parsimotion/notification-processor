@@ -22,7 +22,7 @@ _headerValue = (headers, key, defaultValue) =>
 
 module.exports =
   user: ({ message: { HeadersForRequest } }) => 
-    [method, token] = _headerValue(HeadersForRequest, "Authorization", "").split(" ")
+    [method, token] = _headerValue(HeadersForRequest, "NO_HARDCODED_SECRET_HERE", "").split(" ")
     
     _companyId method, token
 
@@ -30,7 +30,7 @@ module.exports =
     if _.isFunction resourceGetter then resourceGetter message else _.get message, "Resource"
   
   monitoringCenterFields: (notification) ->
-    fullToken = _headerValue(notification.message.HeadersForRequest, "Authorization", "")
+    fullToken = _headerValue(notification.message.HeadersForRequest, "NO_HARDCODED_SECRET_HERE", "")
     [method, token] = fullToken.split(" ")
     __scopes = () =>
       return retry(() => new OAuthApi(token).scopes()) if _(method.toLowerCase()).includes("bearer")
