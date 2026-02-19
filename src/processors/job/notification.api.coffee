@@ -75,6 +75,9 @@ class NotificationsApi
       throw e if options.useAsyncApi
       console.log("Error sending status to notifications-api. Retrying via notifications-api-async")
       retryRequest()
+    .tapCatch (e) =>
+      console.log("Error sending status to notifications-api-async. Ignoring error.")
+      console.log(e)
     .catchReturn()
 
   _makeRequest: (body, { useAsyncApi } = {}) =>
