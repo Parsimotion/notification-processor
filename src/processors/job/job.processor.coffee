@@ -22,7 +22,7 @@ module.exports =
       super(notification, err) and err?.detail?.response?.statusCode not in @nonRetryable
 
     _sanitizeError_: (err) =>
-      _.pick err, ["statusCode", "error"]
+      _.pick err, ["statusCode", "error", "message"]
 
     _onMaxRetryExceeded_: ({ message }, error) =>
       errorMessage = {
