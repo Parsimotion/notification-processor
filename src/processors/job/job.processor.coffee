@@ -27,9 +27,9 @@ module.exports =
     _onMaxRetryExceeded_: ({ message }, error) =>
       errorMessage = {
         message
-        statusCode: error.detail.response.statusCode
+        statusCode: error?.detail?.response?.statusCode
         error
-        request: _.omit error.detail.request, ["resolveWithFullResponse"]
+        request: _.omit error?.detail?.request, ["resolveWithFullResponse"]
       }
       @_ifJobIsNotStopped message, () => 
         @_notificationsApi(message).fail errorMessage
