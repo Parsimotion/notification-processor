@@ -1,3 +1,10 @@
+## [6.0.6](https://github.com/Parsimotion/notification-processor/compare/v6.0.5...v6.0.6) (2026-03-13)
+
+
+### Bug Fixes
+
+* Handle error in job processor with notifications ([80e1dfb](https://github.com/Parsimotion/notification-processor/commit/80e1dfb53df880e38efa456a023454833dfc4b2c))
+
 ## [6.0.5](https://github.com/Parsimotion/notification-processor/compare/v6.0.4...v6.0.5) (2026-02-19)
 
 
