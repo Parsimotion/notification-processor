@@ -45,3 +45,7 @@ yarn.lock
 # Sublime
 *.sublime-workspace
 .idea
+
+site.config
+*.env
+*.env.*
