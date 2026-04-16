@@ -1,3 +1,15 @@
+# [6.1.0](https://github.com/Parsimotion/notification-processor/compare/v6.0.6...v6.1.0) (2026-04-16)
+
+
+### Bug Fixes
+
+* vuelvo script para atras ([805d0ed](https://github.com/Parsimotion/notification-processor/commit/805d0edee15651511d88f85f86fec2bb2ed5ba4d))
+
+
+### Features
+
+* agrego shouldretry antes del process, corrijo script ([3d983e3](https://github.com/Parsimotion/notification-processor/commit/3d983e3fed98d054c3da29a0cd29700a57bb7b66))
+
 ## [6.0.6](https://github.com/Parsimotion/notification-processor/compare/v6.0.5...v6.0.6) (2026-03-13)
 
 
