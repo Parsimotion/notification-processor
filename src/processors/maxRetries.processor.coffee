@@ -7,6 +7,7 @@ module.exports =
     constructor: ({ @processor, @maxRetries = 3 }) ->
 
     process: (notification, context, executionId) ->
+      @_onMaxRetryExceeded_ notification, new Error("max retries exceeded") unless @_shouldRetry_ notification
       @processor notification, context, executionId
       .tap (it) => @_onSuccess_ notification, it 
       .catch (err) =>
