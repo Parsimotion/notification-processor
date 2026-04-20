@@ -33,7 +33,12 @@ module.exports =
       }
 
       @_ifJobIsNotStopped message, () => 
+        console.log("Max retry exceeded for job #{message.JobId} with error #{errorMessage.error}")
+        console.log("Sending NotificationsApi fail")
         @_notificationsApi(message).fail errorMessage
+          .then (response) =>
+            console.log("NotificationsApi fail response: #{response}")
+            response
           .throw new NonRetryable "Max retry exceeded", error
 
     _notificationsApi: ({ HeadersForRequest, JobId }) =>

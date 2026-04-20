@@ -16,6 +16,7 @@ module.exports =
         @_onMaxRetryExceeded_ notification, err
 
     _shouldRetry_: ({ meta: { dequeueCount = 0 } }, err) ->
+      console.log("dequeue count is #{dequeueCount} and max retries is #{@maxRetries}")
       dequeueCount < @maxRetries
 
     _onSuccess_: (notification, result) -> throw new Error "subclass responsability"
