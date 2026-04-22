@@ -30,19 +30,15 @@ module.exports =
 
       _isIgnoredError = (error) => error instanceof IgnoredError
 
-      execute()
-      .tap => @_emitEvent "successful", { context, id, notification }
-      .catch _isIgnoredError, (error) =>
-        @_emitEvent "successful", { context, id, notification, warnings: [error] }
-      .catch (error) =>
-        throw error unless error instanceof NonRetryable
-        @_emitEvent "unsuccessful_non_retryable", { context, id, notification, error }
-      .tapCatch (error) => @_emitEvent "unsuccessful", { context, id, notification, error }
-      .finally => @_emitEvent "finished", { context, id, notification }
-      .asCallback context.done
-
-      return
-  
+      return execute()
+        .tap => @_emitEvent "successful", { context, id, notification }
+        .catch _isIgnoredError, (error) =>
+          @_emitEvent "successful", { context, id, notification, warnings: [error] }
+        .catch (error) =>
+          throw error unless error instanceof NonRetryable
+          @_emitEvent "unsuccessful_non_retryable", { context, id, notification, error }
+        .tapCatch (error) => @_emitEvent "unsuccessful", { context, id, notification, error }
+        .finally => @_emitEvent "finished", { context, id, notification }  
 
     _emitEvent: (eventName, value) =>
       @emit eventName, value if ENABLE_EVENTS
