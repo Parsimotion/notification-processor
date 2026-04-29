@@ -17,9 +17,6 @@ module.exports =
     
     listenTo: (observable) ->
       observable.on "unsuccessful_non_retryable", (payload) => @registerRecord(payload, "unsuccessful")
-      observable.on "unsuccessful", (payload) => @registerRecord(payload, "unsuccessful")
-      observable.on "started", (payload) => @registerRecord(payload, "pending")
-      observable.on "successful", (payload) => @registerRecord(payload, "successful")
 
     registerRecord: (payload, executionStatus) =>
       jobId = _.get(payload, 'notification.message.JobId');
