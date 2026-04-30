@@ -10,7 +10,7 @@ module.exports =
 
     constructor: (args) ->
       super args
-      { @notificationApiUrl, @notificationApiAsyncUrl, @nonRetryable, @silentErrors } = args
+      { @notificationApiUrl, @notificationApiToken, @notificationApiAsyncUrl, @nonRetryable, @silentErrors } = args
 
     process: (notification, context, executionId) =>
       @_ifJobIsNotStopped notification.message, () => super(notification, context, executionId).thenReturn()
@@ -38,7 +38,7 @@ module.exports =
 
     _notificationsApi: ({ HeadersForRequest, JobId }) =>
       new NotificationsApi {
-        token: _.find(HeadersForRequest, { Key: "Authorization" }).Value
+        token: @notificationApiToken or _.find(HeadersForRequest, { Key: "Authorization" }).Value
         jobId: JobId
         @notificationApiUrl
         @notificationApiAsyncUrl
