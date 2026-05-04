@@ -1,3 +1,10 @@
+# [6.2.0](https://github.com/Parsimotion/notification-processor/compare/v6.1.0...v6.2.0) (2026-05-04)
+
+
+### Features
+
+* dejo solo observable non retry, corrijo userId ([9b84bbc](https://github.com/Parsimotion/notification-processor/commit/9b84bbc792a639c2fa46007205f533dbe86fee4c))
+
 # [6.1.0](https://github.com/Parsimotion/notification-processor/compare/v6.0.6...v6.1.0) (2026-04-16)
 
 
