@@ -2,7 +2,6 @@ module.exports =
   Builder: require "./processor.builder"
   Observers:
     LoggerObserver: require "./observers/logger.observer"
-    IncidentsApi: require "./observers/incidentsApi.observer"
     MonitoringCenter: require "./observers/monitoringCenter.observer"
   Processors:
     DeadLetterProcessor: require "./processors/deadletter.processor"
