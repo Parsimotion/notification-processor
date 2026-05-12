@@ -1,5 +1,4 @@
 _ = require("lodash")
-request = require("request-promise")
 MaxRetriesProcessor = require("../maxRetries.processor")
 NonRetryable = require("../../exceptions/non.retryable")
 NotificationsApi = require("./notification.api")

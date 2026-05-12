@@ -58,6 +58,10 @@ describe "JobProcessor", ->
     it "and dequeue counter is greater than MAX_DEQUEUE_COUNT, should notify for fail to notificationsApi", ->
       @timeout 10000
       _notificationsApiGetJob()
+      # extra interceptor: MaxRetriesProcessor fires a fire-and-forget _onMaxRetryExceeded_ before the processor runs
+      nock NOTIFICATIONS_URL
+        .get "/jobs/#{JOB_ID}"
+        .reply 200, { stopped: false }
       mockFailedNotificationWith 500
       _processJob { dequeueCount: 6 }
       .tap -> nock.isDone().should.be.ok()

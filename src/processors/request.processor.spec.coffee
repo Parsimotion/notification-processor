@@ -2,7 +2,6 @@ nock = require "nock"
 should = require "should"
 sinon = require "sinon"
 require "should-sinon"
-errors = require "request-promise/errors";
 Promise = require "bluebird"
 
 RequestProcessor = require "./request.processor"

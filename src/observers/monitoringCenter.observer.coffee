@@ -2,7 +2,7 @@ _ = require "lodash"
 Promise = require "bluebird"
 retry = require "bluebird-retry"
 debug = require("debug") "notification-processor:observers:monitor-center"
-AWS = require "aws-sdk"
+{ FirehoseClient, PutRecordCommand } = require "@aws-sdk/client-firehose"
 moment = require "moment"
 
 TYPE_PROPERTIES = ["cause.type", "type"]
@@ -12,8 +12,8 @@ module.exports =
   class MonitoringCenterObserver
 
     constructor: ({ @sender, @clientId, @app, @job, @propertiesToOmit = "auth", connection : { accessKeyId, secretAccessKey, @deliveryStream, @jobsDeliveryStream, region } }) ->
-      @firehose = new AWS.Firehose { accessKeyId, secretAccessKey, region }
-      @uploadToFirehose = Promise.promisify(@firehose.putRecord).bind(@firehose)
+      @firehose = new FirehoseClient { region, credentials: { accessKeyId, secretAccessKey } }
+      @uploadToFirehose = (params) => Promise.resolve @firehose.send new PutRecordCommand(params)
     
     listenTo: (observable) ->
       observable.on "unsuccessful_non_retryable", (payload) => @registerRecord(payload, "unsuccessful")
@@ -28,8 +28,8 @@ module.exports =
         return if _.isEmpty(record)
 
         uploadParams = {
-          DeliveryStreamName: deliveryStreamName, 
-          Record: Data: JSON.stringify(record)
+          DeliveryStreamName: deliveryStreamName,
+          Record: Data: Buffer.from JSON.stringify(record)
         }
         debug "Uploading record #{record.event}/#{record.id} to firehose delivery stream #{uploadParams.DeliveryStreamName}"
         __uploadToFirehose = () => @uploadToFirehose uploadParams

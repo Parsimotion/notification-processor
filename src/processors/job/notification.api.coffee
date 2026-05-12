@@ -1,5 +1,5 @@
 _ = require "lodash"
-requestPromise = require("request-promise")
+axios = require("axios")
 retry = require("bluebird-retry")
 Promise = require("bluebird")
 NodeCache = require("node-cache");
@@ -59,13 +59,12 @@ class NotificationsApi
     @_doFetchJob(jobId, aToken)
     .tap (job) => jobsCache.set jobId, job
 
-  _doFetchJob: (jobId, token) => 
-    __fetchJob = () => requestPromise({
+  _doFetchJob: (jobId, token) =>
+    __fetchJob = () => axios({
       url: "#{ @notificationApiUrl }/jobs/#{ jobId or @jobId }"
       method: "GET"
       headers: { authorization: token or @token }
-      json: true
-    }).promise()
+    }).then (response) -> response.data
 
     retry __fetchJob, throw_original: true
 
@@ -79,12 +78,13 @@ class NotificationsApi
 
   _makeRequest: (body, { useAsyncApi } = {}) =>
     url = if useAsyncApi then @notificationApiAsyncUrl else @notificationApiUrl
-    requestPromise {
+    axios {
       url: "#{ url }/jobs/#{ @jobId }/operations"
       method: "POST"
       headers: { authorization: @token }
-      json: body
+      data: body
     }
+    .then (response) -> response.data
   
   _shouldUseCachedValue: (value) =>
     process.env.NODE_ENV isnt "test" and value?

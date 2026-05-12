@@ -6,11 +6,11 @@ _ = require "lodash"
 class MockRedisClient
   constructor: ->
     @refreshSpies()
-  auth: ->
+  connect: -> Promise.resolve()
   refreshSpies: =>
-    @spies = publishAsync: sinon.spy()
-  publishAsync: (key,value) ->
-    Promise.resolve @spies.publishAsync key, value
+    @spies = publish: sinon.spy()
+  publish: (key,value) ->
+    Promise.resolve @spies.publish key, value
 
 stub =
   "../services/redis":
