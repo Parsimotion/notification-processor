@@ -17,7 +17,7 @@ module.exports = (grunt) ->
   #-----
   grunt.registerTask "default", "build"
   grunt.registerTask "test", "mochaTest"
-  grunt.registerTask "build", ["clean:build", "exec:compile", "clean:specs"]
+  grunt.registerTask "build", ["clean:build", "exec:compile", "exec:copyJs", "clean:specs"]
 
   #------
   #Config
@@ -29,7 +29,9 @@ module.exports = (grunt) ->
       specs: src: "lib/**/*.spec.js"
 
     #Compile coffee
-    exec: compile: cmd: "./node_modules/coffeescript/bin/coffee --compile --transpile --output lib/ src/"
+    exec:
+      compile: cmd: "./node_modules/coffeescript/bin/coffee --compile --output lib/ src/"
+      copyJs: cmd: "cp src/uuid-cjs.js lib/uuid-cjs.js"
 
     # Run tests
     mochaTest:

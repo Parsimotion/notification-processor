@@ -3,7 +3,7 @@ OAuthApi = require("../services/oAuthApi")
 NotificationsApi = require("../processors/job/notification.api")
 Promise = require("bluebird")
 retry = require("bluebird-retry")
-uuid = require("uuid/v4")
+uuid = require("../uuid-cjs")
 
 notificationsApi = new NotificationsApi { }
 
