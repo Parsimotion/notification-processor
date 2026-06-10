@@ -34,7 +34,7 @@ module.exports =
 
       @_ifJobIsNotStopped message, () => 
         @_notificationsApi(message).fail errorMessage
-          .throw new NonRetryable { message: "Max retry exceeded", code: "max_retry_exceeded" }, error
+          .throw new NonRetryable "Max retry exceeded", error
 
     _notificationsApi: ({ HeadersForRequest, JobId }) =>
       new NotificationsApi {
