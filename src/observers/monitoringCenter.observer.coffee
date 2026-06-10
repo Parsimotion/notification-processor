@@ -41,7 +41,7 @@ module.exports =
     _mapper: ({ id, notification, error, warnings, executionStatus, jobId }) ->
       Promise.method(@sender.monitoringCenterFields.bind(@sender))(notification)
       .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId, app, job, partialMessage }) => 
-        return Promise.resolve({ }) if !eventId
+        return Promise.resolve({ }) if !eventId or error?.statusCode
         theRequest = _.get(error, "detail.request") or _.get(error, "cause.detail.request")
 
         errorType = @_retrieveMessageFromError error, TYPE_PROPERTIES, "unknown"

@@ -3,6 +3,7 @@ module.exports =
     constructor: (message, @cause) ->
       @name = @constructor.name
       @message = message
+      @statusCode = @cause?.statusCode or @cause?.detail?.response?.statusCode
       @stack = (new Error).stack
 
     @:: = new Error
