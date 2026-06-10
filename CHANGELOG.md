@@ -1,3 +1,16 @@
+# [6.3.0](https://github.com/Parsimotion/notification-processor/compare/v6.2.0...v6.3.0) (2026-06-10)
+
+
+### Bug Fixes
+
+* saco validacion y saco code ([526156e](https://github.com/Parsimotion/notification-processor/commit/526156e9301427e90c2be343143b164c673bfaf9))
+
+
+### Features
+
+* agrego code a nonretryable para cdm ([8319835](https://github.com/Parsimotion/notification-processor/commit/8319835c07e238622735f657f651d2f302d68688))
+* agrego validacion para ignorar errores en cdm con statuscode ([166b5f3](https://github.com/Parsimotion/notification-processor/commit/166b5f38210df24669ca03edba5d143e94941400))
+
 # [6.2.0](https://github.com/Parsimotion/notification-processor/compare/v6.1.0...v6.2.0) (2026-05-04)
 
 
