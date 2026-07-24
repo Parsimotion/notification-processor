@@ -10,6 +10,13 @@ DEFAULT_NOTIFICATIONS_API_ASYNC_URL = process.env.DEFAULT_NOTIFICATIONS_API_ASYN
 DEFAULT_NOTIFICATIONS_API_URL = process.env.NOTIFICATIONS_API_URL || "https://apps.producteca.com/notifications-api/api"
 HOUR = 60 * 60
 
+_monitoringRequest = ({ HeadersForRequest } = {}) ->
+  headers = {}
+  _.forEach HeadersForRequest, ({ Key, Value }) ->
+    headers[Key] = Value if Key?.toLowerCase() in ["x-producteca-event-id", "x-resource-id"]
+  return null if _.isEmpty(headers)
+  { headers }
+
 #Para minimizar las requests a notifications-api, cachea unos segundos el estado del job
 jobsCache = new NodeCache({ stdTTL: NOTIFICATIONS_API_JOBS_CACHE_TTL })
 #A nivel dominio, podria ser cache sin TTL porque un job stoppeado queda asi para siempre. Pero se pone TTL de 2h para que luego libere la memoria
@@ -21,8 +28,10 @@ class NotificationsApi
       @token = "Basic #{new Buffer("#{companyId}:#{NOTIFICATIONS_API_MASTER_TOKEN}").toString("base64")}";
 
   success: (response, options) => 
-    { statusCode } = response;
-    __makeRequest = () => @_makeRequest { statusCode, success: yes }, options
+    { statusCode, message } = response;
+    body = { statusCode, success: yes }
+    body.request = request if request = _monitoringRequest(message)
+    __makeRequest = () => @_makeRequest body, options
     __retryRequest = () => @success(response, { useAsyncApi: true })
     
     @_retryViaAsyncOrIgnore(__makeRequest, __retryRequest, options)
