@@ -7,11 +7,14 @@ _normalizeHeaders = (headers) ->
     .fromPairs()
     .value()
 
+_eventHeader = (headers) ->
+  _.find headers, (value, key) -> _.toLower(key) is "x-producteca-event-id"
+
 builderRequest = (apiUrl, fullResponse) -> ({ message }, context, executionId) ->
   { Resource, Method, Body, HeadersForRequest, JobId } = message
   json = if Body?.length > 0 then JSON.parse(Body) else true
   headers = _normalizeHeaders HeadersForRequest
-  headers['x-producteca-event-id'] = "#{JobId}/#{executionId}" if JobId
+  headers['x-producteca-event-id'] = "#{JobId}/#{executionId}" if JobId and _.isEmpty(_eventHeader(headers))
   url = headers.Domain || apiUrl;
 
   return {
