@@ -7,6 +7,7 @@ moment = require "moment"
 
 TYPE_PROPERTIES = ["cause.type", "type"]
 MESSAGE_PROPERTIES = ["cause.message", "message"]
+CDM_FORCE_REGISTER_STATUS_CODES = (process.env.CDM_FORCE_REGISTER_STATUS_CODES or "").split(",").map (it) -> parseInt it, 10
 
 module.exports = 
   class MonitoringCenterObserver
@@ -40,8 +41,8 @@ module.exports =
     
     _mapper: ({ id, notification, error, warnings, executionStatus, jobId }) ->
       Promise.method(@sender.monitoringCenterFields.bind(@sender))(notification)
-      .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId, app, job, partialMessage }) => 
-        return Promise.resolve({ }) if !eventId or error?.statusCode
+      .then ({ eventType, resource, companyId, userId, externalReference, userExternalReference, eventId, eventTimestamp, parentEventId, app, job, partialMessage }) =>
+        return Promise.resolve({ }) if !eventId or @_shouldSkipByStatusCode(error)
         theRequest = _.get(error, "detail.request") or _.get(error, "cause.detail.request")
 
         errorType = @_retrieveMessageFromError error, TYPE_PROPERTIES, "unknown"
@@ -116,8 +117,10 @@ module.exports =
           }
       }
 
-    _retrieveMessageFromError: (error, properties, defaultValue) -> 
+    _retrieveMessageFromError: (error, properties, defaultValue) ->
       error and _(properties).map (property) => _.get error, property
         .reject _.isEmpty
         .get 0, defaultValue
 
+    _shouldSkipByStatusCode: (error) ->
+      error?.statusCode and not _.includes CDM_FORCE_REGISTER_STATUS_CODES, error.statusCode
