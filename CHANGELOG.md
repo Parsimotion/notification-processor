@@ -1,3 +1,10 @@
+# [6.4.0](https://github.com/Parsimotion/notification-processor/compare/v6.3.0...v6.4.0) (2026-07-28)
+
+
+### Features
+
+* tests y logica statuscode ([5a0cc03](https://github.com/Parsimotion/notification-processor/commit/5a0cc034e0bd538bff7b07235acd817553726672))
+
 # [6.3.0](https://github.com/Parsimotion/notification-processor/compare/v6.2.0...v6.3.0) (2026-06-10)
 
 
