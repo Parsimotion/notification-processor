@@ -4,6 +4,7 @@ module.exports =
     LoggerObserver: require "./observers/logger.observer"
     IncidentsApi: require "./observers/incidentsApi.observer"
     MonitoringCenter: require "./observers/monitoringCenter.observer"
+    MonitoringCenterRegisterAll: require "./observers/monitoringCenterRegisterAll.observer"
   Processors:
     DeadLetterProcessor: require "./processors/deadletter.processor"
     RequestProcessor: require "./processors/request.processor"
