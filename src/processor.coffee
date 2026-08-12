@@ -3,7 +3,7 @@ NonRetryable = require "./exceptions/non.retryable"
 IgnoredError = require "./exceptions/ignored.error"
 EventEmitter = require "events"
 Promise = require "bluebird"
-uuid = require "uuid/v4"
+uuid = require "./uuid-cjs"
 newrelic = _.once -> require("newrelic")
 
 ENABLE_EVENTS = process.env.ENABLE_EVENTS isnt "false"

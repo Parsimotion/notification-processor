@@ -16,7 +16,7 @@ module.exports =
       $message = Promise.props { body: @_mapper(id, notification, error.cause) }
       $message
       .tap (message) => debug "To publish message %o", message
-      .then (message) => @messageSender.send message
+      .then (message) => @messageSender.sendMessages message
 
     _mapper: (id, notification, err) ->
       Promise.props
@@ -38,7 +38,5 @@ module.exports =
       .then JSON.stringify
 
     _buildMessageSender: (connectionString, topic) ->
-      ServiceBusClient
-      .createFromConnectionString(connectionString)
-      .createQueueClient(topic)
-      .createSender()
+      new ServiceBusClient(connectionString)
+      .createSender(topic)

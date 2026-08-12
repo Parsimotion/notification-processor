@@ -11,14 +11,22 @@ module.exports =
         db: process.env.REDIS_DB
         auth: process.env.REDIS_AUTH
 
-      @redis = Redis.createClient redis.port, redis.host, db: redis.db
-      @redis.auth redis.auth if redis.auth
+      socketOptions = host: redis.host
+      socketOptions.port = Number redis.port if redis.port
+
+      clientOptions = socket: socketOptions
+      clientOptions.database = Number redis.db if redis.db
+      clientOptions.password = redis.auth if redis.auth
+
+      @redis = Redis.createClient clientOptions
+      @_connected = Promise.resolve @redis.connect()
 
     publish: (notification, value) =>
       Promise.props
         channel: @_getChannel(notification)
         value: @_buildValue_(value)
-      .then ({ channel, value }) => @redis.publishAsync channel, value
+      .then ({ channel, value }) =>
+        @_connected.then => Promise.resolve @redis.publish channel, value
 
     _getChannel: (notification) =>
       Promise.props

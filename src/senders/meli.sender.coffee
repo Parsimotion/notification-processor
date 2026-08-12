@@ -1,4 +1,4 @@
-uuid = require "uuid/v4"
+uuid = require "../uuid-cjs"
 Promise = require "bluebird"
 UserIdTranslator = require "../services/userIdTranslator"
 module.exports =
