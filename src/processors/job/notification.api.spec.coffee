@@ -26,6 +26,21 @@ describe "NotificationsApi", ->
 
     notificationsApi.success { message: { }, statusCode }
 
+  it "on success: should forward monitoring correlation to notificationsApi", ->
+    statusCode = 202
+    eventId = "job-id/execution-id"
+    bodyExpected = { statusCode, success: yes, request: { headers: { "x-producteca-event-id": eventId, "X-resource-id": "123" } } }
+
+    nock(NOTIFICATIONS_URL)
+    .post "/jobs/#{ JOB_ID }/operations", (body) -> body.should.be.eql bodyExpected
+    .reply(200)
+
+    notificationsApi.success { statusCode, message: { HeadersForRequest: [
+      { Key: "x-producteca-event-id", Value: eventId }
+      { Key: "X-resource-id", Value: "123" }
+      { Key: "Authorization", Value: "secret" }
+    ] } }
+
   it "on fail: should send success: false with error message to notificationsApi", ->
     @timeout(10000)
     statusCode = 400
