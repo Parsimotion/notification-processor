@@ -1,3 +1,17 @@
+# [7.1.0](https://github.com/Parsimotion/notification-processor/compare/v7.0.0...v7.1.0) (2026-08-20)
+
+
+### Bug Fixes
+
+* se agregan parentesis ya que tiraba error de sintaxis ([226741c](https://github.com/Parsimotion/notification-processor/commit/226741c4100c8940080c4e91fe7323896f76df4e))
+
+
+### Features
+
+* se agrega mapeo para que no se sobreescriba x producteca event id en notifications api ([adfc650](https://github.com/Parsimotion/notification-processor/commit/adfc650d84f960b7dc23ffba5af34b88e35b30fc))
+* se agrega test ([72fcd41](https://github.com/Parsimotion/notification-processor/commit/72fcd416d8ac30bc84beffe60e31da22721768b3))
+* se agrega validacion para header de eventId, para que no se sobreescriba ([ed25994](https://github.com/Parsimotion/notification-processor/commit/ed2599467f96e4232f749d5979564dfbfb8d3d6c))
+
 # [7.0.0](https://github.com/Parsimotion/notification-processor/compare/v6.4.0...v7.0.0) (2026-07-28)
 
 # [6.4.0](https://github.com/Parsimotion/notification-processor/compare/v6.3.0...v6.4.0) (2026-07-28)
